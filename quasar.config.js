@@ -2,6 +2,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers'
+import { cloudflare } from '@cloudflare/vite-plugin'
 
 export default defineConfig((/* ctx */) => {
   return {
@@ -36,6 +37,9 @@ export default defineConfig((/* ctx */) => {
         browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
         node: 'node20',
       },
+      env: {
+    APP_VERSION: JSON.stringify(require('./package.json').version)
+  },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,
@@ -59,6 +63,7 @@ export default defineConfig((/* ctx */) => {
       vitePlugins: [
         [
           'vite-plugin-checker',
+          cloudflare(),
           {
             eslint: {
               lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{js,mjs,cjs,vue}"',

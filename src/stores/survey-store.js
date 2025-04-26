@@ -7,7 +7,8 @@ import {
   getAuditStats,
   updateAudit,
   deleteAudit,
-} from '../supabase'
+  subscribeToAudits
+} from './supabase'
 
 export const useSurveyStore = defineStore('survey', () => {
   // State
@@ -21,6 +22,7 @@ export const useSurveyStore = defineStore('survey', () => {
   })
   const loading = ref(false)
   const error = ref(null)
+  let subscription = null
 
   // Getters
   const getAuditById = computed(() => {
@@ -35,6 +37,72 @@ export const useSurveyStore = defineStore('survey', () => {
     return (ward) => audits.value.filter((audit) => audit.ward === ward)
   })
 
+  // Real-time subscription
+  const subscribeToRealtimeUpdates = () => {
+    // Unsubscribe from any existing subscription
+    if (subscription) {
+      subscription.unsubscribe()
+    }
+
+    // Create a new subscription
+    subscription = subscribeToAudits((payload) => {
+      console.log('Real-time update received:', payload)
+
+      // Handle different types of changes
+      const { eventType, new: newRecord, old: oldRecord } = payload
+
+      if (eventType === 'INSERT') {
+        // Add the new record to the audits array
+        audits.value = [newRecord, ...audits.value]
+        // Update high-risk audits if applicable
+        if (newRecord.isHighRisk) {
+          highRiskAudits.value = [newRecord, ...highRiskAudits.value]
+        }
+        // Refresh stats
+        fetchStats()
+      } 
+      else if (eventType === 'UPDATE') {
+        // Update the existing record in the audits array
+        const index = audits.value.findIndex(audit => audit.id === newRecord.id)
+        if (index !== -1) {
+          audits.value[index] = newRecord
+        }
+
+        // Update high-risk audits if applicable
+        const highRiskIndex = highRiskAudits.value.findIndex(audit => audit.id === newRecord.id)
+        if (newRecord.isHighRisk && highRiskIndex === -1) {
+          // Add to high-risk if it wasn't there before
+          highRiskAudits.value = [newRecord, ...highRiskAudits.value]
+        } else if (!newRecord.isHighRisk && highRiskIndex !== -1) {
+          // Remove from high-risk if it's no longer high-risk
+          highRiskAudits.value.splice(highRiskIndex, 1)
+        } else if (newRecord.isHighRisk && highRiskIndex !== -1) {
+          // Update existing high-risk record
+          highRiskAudits.value[highRiskIndex] = newRecord
+        }
+
+        // Refresh stats
+        fetchStats()
+      } 
+      else if (eventType === 'DELETE') {
+        // Remove the record from the audits array
+        audits.value = audits.value.filter(audit => audit.id !== oldRecord.id)
+        // Remove from high-risk audits if applicable
+        highRiskAudits.value = highRiskAudits.value.filter(audit => audit.id !== oldRecord.id)
+        // Refresh stats
+        fetchStats()
+      }
+    })
+  }
+
+  // Cleanup function to unsubscribe when the store is no longer needed
+  const unsubscribeFromRealtimeUpdates = () => {
+    if (subscription) {
+      subscription.unsubscribe()
+      subscription = null
+    }
+  }
+
   // Actions
   const fetchAudits = async () => {
     loading.value = true
@@ -46,6 +114,9 @@ export const useSurveyStore = defineStore('survey', () => {
       if (fetchError) throw fetchError
 
       audits.value = data || []
+
+      // Set up real-time subscription after initial data fetch
+      subscribeToRealtimeUpdates()
     } catch (err) {
       console.error('Error fetching audits:', err)
       error.value = err.message || 'Failed to fetch audits'
@@ -176,5 +247,7 @@ export const useSurveyStore = defineStore('survey', () => {
     addAudit,
     editAudit,
     removeAudit,
+    subscribeToRealtimeUpdates,
+    unsubscribeFromRealtimeUpdates
   }
 })

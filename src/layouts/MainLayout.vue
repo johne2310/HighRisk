@@ -4,15 +4,15 @@
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
-        <q-toolbar-title> Patient Medication Audit Survey </q-toolbar-title>
+        <q-toolbar-title> High Risk Patient Audit</q-toolbar-title>
 
-        <div>Healthcare Data Collection</div>
+        <div>ver: {{ packageInfo.version }}</div>
       </q-toolbar>
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
-        <q-item-label header> Essential Links </q-item-label>
+        <q-item-label header> Menu </q-item-label>
 
         <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
       </q-list>
@@ -27,6 +27,7 @@
 <script setup>
 import { ref } from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
+import packageInfo from '../../package.json'
 
 const linksList = [
   {
@@ -54,12 +55,6 @@ const linksList = [
     link: '#/high-risk',
   },
   {
-    title: 'Reports',
-    caption: 'Generate audit reports',
-    icon: 'assessment',
-    link: '#/reports',
-  },
-  {
     title: 'Settings',
     caption: 'Application settings',
     icon: 'settings',
@@ -78,4 +73,5 @@ const leftDrawerOpen = ref(false)
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value
 }
+
 </script>

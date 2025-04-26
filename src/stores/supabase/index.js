@@ -11,6 +11,23 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey)
 console.log('Supabase client initialized')
 
+// Set up real-time subscription functions
+export const subscribeToAudits = (callback) => {
+  return supabase
+    .channel('patient_audits_changes')
+    .on('postgres_changes', 
+      { 
+        event: '*', 
+        schema: 'public', 
+        table: 'patient_audits' 
+      }, 
+      (payload) => {
+        callback(payload)
+      }
+    )
+    .subscribe()
+}
+
 /**
  * Save a patient audit to Supabase
  * @param {Object} auditData - The audit data to save

@@ -8,7 +8,6 @@ const routes = [
       { path: 'surveys', component: () => import('pages/SurveysListPage.vue') },
       { path: 'surveys/:id', component: () => import('pages/SurveyPage.vue') },
       { path: 'high-risk', component: () => import('pages/HighRiskPage.vue') },
-      { path: 'reports', component: () => import('pages/ReportsPage.vue') },
       { path: 'settings', component: () => import('pages/SettingsPage.vue') },
       { path: 'help', component: () => import('pages/HelpPage.vue') },
     ],

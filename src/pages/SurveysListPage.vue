@@ -129,7 +129,7 @@
 import { useRouter } from 'vue-router'
 import { useSurveyStore } from 'src/stores/survey-store'
 import { useQuasar } from 'quasar'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, onUnmounted, ref, computed } from 'vue'
 
 const $q = useQuasar()
 const router = useRouter()
@@ -186,9 +186,14 @@ const clearFilters = () => {
   selectedWard.value = null
 }
 
-// Fetch audits when the component is mounted
+// Fetch audits and set up real-time subscription when the component is mounted
 onMounted(async () => {
   await surveyStore.fetchAudits()
+})
+
+// Clean up subscription when component is unmounted
+onUnmounted(() => {
+  surveyStore.unsubscribeFromRealtimeUpdates()
 })
 
 // Edit an audit

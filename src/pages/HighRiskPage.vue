@@ -133,7 +133,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { useSurveyStore } from 'src/stores/survey-store'
-import { onMounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed } from 'vue'
 
 const router = useRouter()
 const surveyStore = useSurveyStore()
@@ -169,6 +169,11 @@ onMounted(async () => {
     surveyStore.fetchHighRiskAudits(), 
     surveyStore.fetchStats()
   ])
+})
+
+// Clean up subscription when component is unmounted
+onUnmounted(() => {
+  surveyStore.unsubscribeFromRealtimeUpdates()
 })
 
 // View audit details
