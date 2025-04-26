@@ -12,7 +12,7 @@
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
-        <q-item-label header> Menu </q-item-label>
+        <q-item-label class="item-header" header> Menu </q-item-label>
 
         <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
       </q-list>
@@ -34,7 +34,7 @@ const linksList = [
     title: 'Dashboard',
     caption: 'Overview of audit data',
     icon: 'dashboard',
-    link: '/',
+    link: '#/',
   },
   {
     title: 'New Survey',
@@ -74,4 +74,10 @@ function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value
 }
 
+
 </script>
+<style>
+  .item-header {
+  font-size: 20px;
+}
+</style>
