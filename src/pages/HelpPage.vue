@@ -43,21 +43,6 @@
               <q-expansion-item
                 group="help"
                 icon="help_outline"
-                label="How do I generate reports?"
-                header-class="text-primary"
-              >
-                <q-card>
-                  <q-card-section>
-                    Navigate to the Reports page from the menu. Select the report type, date range,
-                    and any other filters you need, then click "Generate Report". You can export the
-                    report in various formats.
-                  </q-card-section>
-                </q-card>
-              </q-expansion-item>
-
-              <q-expansion-item
-                group="help"
-                icon="help_outline"
                 label="Can I edit a submitted audit?"
                 header-class="text-primary"
               >
@@ -105,7 +90,7 @@
               <ol>
                 <li>Create a new audit for each patient</li>
                 <li>Record whether they are on 5+ medications</li>
-                <li>View reports to analyze the data</li>
+                <li>View collected data in the audits list</li>
               </ol>
 
               <div class="text-subtitle1 q-mb-sm q-mt-md">Data Collection</div>

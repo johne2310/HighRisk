@@ -4,7 +4,7 @@
 
     <div class="row q-col-gutter-md">
       <!-- Quick Stats -->
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-6 col-lg-3">
         <q-card class="bg-primary text-white">
           <q-card-section>
             <div class="text-h6">Total Patients Audited</div>
@@ -16,7 +16,7 @@
         </q-card>
       </div>
 
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-6 col-lg-3">
         <q-card class="bg-secondary text-white">
           <q-card-section>
             <div class="text-h6">High Risk Patients</div>
@@ -28,7 +28,7 @@
         </q-card>
       </div>
 
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-6 col-lg-3">
         <q-card class="bg-accent text-white">
           <q-card-section>
             <div class="text-h6">Today's Audits</div>
@@ -80,7 +80,6 @@
             </q-card-section>
           </q-card>
         </div>
-
       </div>
     </div>
   </q-page>
@@ -94,11 +93,9 @@ import { onMounted, onUnmounted } from 'vue'
 const $router = useRouter()
 const surveyStore = useSurveyStore()
 
-// Fetch statistics and set up real-time updates when the component is mounted
+// Fetch statistics when the component is mounted
 onMounted(async () => {
   await surveyStore.fetchStats()
-  // Set up real-time subscription to ensure dashboard updates in real-time
-  surveyStore.subscribeToRealtimeUpdates()
 })
 
 // Clean up subscription when component is unmounted

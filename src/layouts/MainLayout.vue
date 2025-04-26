@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header bordered>
+    <q-header elevated>
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
@@ -12,7 +12,8 @@
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
-        <q-item-label class="item-label" header> Menu </q-item-label>
+        <q-item-label header> Menu </q-item-label>
+
         <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
       </q-list>
     </q-drawer>
@@ -74,9 +75,3 @@ function toggleLeftDrawer() {
 }
 
 </script>
-<style>
-.item-label {
-  font-size: 20px;
-  text-align: start;
-}
-</style>

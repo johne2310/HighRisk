@@ -10,7 +10,6 @@ A Quasar application for collecting and managing audit data for high-risk patien
 - Form for collecting patient medication audit data
 - List view of all audits with edit and delete functionality
 - High-risk patients view
-- Reporting functionality
 - Settings management
 - Help and support resources
 
@@ -75,13 +74,6 @@ Before running the application, you need to configure Supabase:
 
 1. Navigate to the "High Risk Patients" page to see patients on 5+ medications
 2. View the summary statistics at the bottom of the page
-
-### Generating Reports
-
-1. Navigate to the "Reports" page
-2. Select the report type, date range, and other filters
-3. Click "Generate Report"
-4. Export the report in your preferred format (PDF, CSV)
 
 ## Development
 
