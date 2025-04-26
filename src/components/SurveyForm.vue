@@ -72,8 +72,8 @@ import { useSettingsStore } from '../stores/settings-store'
 const props = defineProps({
   initialData: {
     type: Object,
-    default: null
-  }
+    default: null,
+  },
 })
 
 // Get settings store
@@ -91,7 +91,7 @@ const defaultForm = {
 }
 
 // Form data
-const form = ref({...defaultForm})
+const form = ref({ ...defaultForm })
 
 // Options for high-risk radio buttons
 const highRiskOptions = [
@@ -100,30 +100,34 @@ const highRiskOptions = [
 ]
 
 // Watch for changes in initialData prop
-watch(() => props.initialData, (newValue) => {
-  if (newValue) {
-    // If we have initial data, use it to populate the form
+watch(
+  () => props.initialData,
+  (newValue) => {
+    if (newValue) {
+      // If we have initial data, use it to populate the form
 
-    // Create a new object with all properties from newValue
-    const formData = {}
-    for (const key in newValue) {
-      formData[key] = newValue[key]
-    }
+      // Create a new object with all properties from newValue
+      const formData = {}
+      for (const key in newValue) {
+        formData[key] = newValue[key]
+      }
 
-    // Ensure all required fields are present
-    form.value = {
-      auditDate: formData.auditDate || new Date().toISOString().substr(0, 10),
-      collectorName: formData.collectorName || '',
-      patientId: formData.patientId || '',
-      bedNumber: formData.bedNumber || '',
-      ward: formData.ward || '',
-      hospital: formData.hospital || '',
-      isHighRisk: formData.isHighRisk !== undefined ? formData.isHighRisk : null,
-      // Include any other fields that might be in the original data
-      ...formData
+      // Ensure all required fields are present
+      form.value = {
+        auditDate: formData.auditDate || new Date().toISOString().substr(0, 10),
+        collectorName: formData.collectorName || '',
+        patientId: formData.patientId || '',
+        bedNumber: formData.bedNumber || '',
+        ward: formData.ward || '',
+        hospital: formData.hospital || '',
+        isHighRisk: formData.isHighRisk !== undefined ? formData.isHighRisk : null,
+        // Include any other fields that might be in the original data
+        ...formData,
+      }
     }
-  }
-}, { immediate: true })
+  },
+  { immediate: true },
+)
 
 // Load settings from settings store if available
 onMounted(() => {
@@ -137,6 +141,11 @@ onMounted(() => {
     // Load hospital from settings store if available
     if (settingsStore.userSettings.defaultHospital) {
       form.value.hospital = settingsStore.userSettings.defaultHospital
+    }
+
+    // Load ward from settings store if available
+    if (settingsStore.userSettings.defaultWard) {
+      form.value.ward = settingsStore.userSettings.defaultWard
     }
 
     // Fallback to localStorage for backward compatibility
@@ -183,14 +192,14 @@ const resetForm = () => {
     // Ensure all required fields are present
     form.value = {
       auditDate: formData.auditDate || new Date().toISOString().substr(0, 10),
-      collectorName: formData.collectorName || '',
+      // collectorName: formData.collectorName || '',
       patientId: formData.patientId || '',
       bedNumber: formData.bedNumber || '',
       ward: formData.ward || '',
       hospital: formData.hospital || '',
-      isHighRisk: formData.isHighRisk !== undefined ? formData.isHighRisk : null,
+      // isHighRisk: formData.isHighRisk !== undefined ? formData.isHighRisk : null,
       // Include any other fields that might be in the original data
-      ...formData
+      ...formData,
     }
   } else {
     // If we're in create mode, reset to defaults but keep collector name and hospital
@@ -199,6 +208,7 @@ const resetForm = () => {
       auditDate: new Date().toISOString().substr(0, 10), // Always use current date
       collectorName: form.value.collectorName, // Keep the collector name
       hospital: form.value.hospital, // Keep the hospital
+      ward: form.value.ward,
     }
   }
 }

@@ -4,9 +4,15 @@
       <div class="col-12 col-md-8">
         <q-card class="q-pa-md">
           <q-card-section>
-            <div class="text-h5 text-primary q-mb-md">{{ isEditing ? 'Edit Patient Audit' : 'New Patient Audit' }}</div>
+            <div class="text-h5 text-primary q-mb-md">
+              {{ isEditing ? 'Edit Patient Audit' : 'New Patient Audit' }}
+            </div>
             <div class="text-subtitle2 q-mb-lg">
-              {{ isEditing ? 'Update the patient medication audit information.' : 'Complete the form below to record a patient medication audit.' }}
+              {{
+                isEditing
+                  ? 'Update the patient medication audit information.'
+                  : 'Complete the form below to record a patient medication audit.'
+              }}
             </div>
           </q-card-section>
 
@@ -68,16 +74,16 @@ const handleSubmit = async (formData) => {
   //   timeout: 0,
   // })
 
-  let result;
+  let result
 
   // Save or update the audit data using the store
   if (isEditing.value) {
-    result = await surveyStore.editAudit(auditId.value, formData);
+    result = await surveyStore.editAudit(auditId.value, formData)
   } else {
-    result = await surveyStore.addAudit(formData);
+    result = await surveyStore.addAudit(formData)
   }
 
-  const { success, error } = result;
+  const { success, error } = result
 
   // Dismiss all notifications in the 'loading' group
   // Using Quasar's Notify plugin API to dismiss notifications
@@ -93,13 +99,15 @@ const handleSubmit = async (formData) => {
     $q.notify({
       color: 'positive',
       icon: 'check_circle',
-      message: isEditing.value ? 'Survey data updated successfully' : 'Survey data saved successfully',
+      message: isEditing.value
+        ? 'Survey data updated successfully'
+        : 'Survey data saved successfully',
       position: 'top',
       timeout: 2000,
     })
 
     // Redirect to surveys list
-    router.push('/surveys')
+    // router.push('/surveys')
   } else {
     // Show error notification
     $q.notify({

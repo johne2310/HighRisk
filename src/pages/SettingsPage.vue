@@ -12,130 +12,51 @@
             <q-form class="q-gutter-md q-mt-md">
               <q-input filled v-model="userSettings.defaultName" label="Default Collector Name" />
 
+              <!-- Hospital dropdown -->
               <q-select
                 filled
-                v-model="userSettings.defaultHospital"
-                :options="['Richmond', 'Eastern', 'Camberwell', 'Geelong', 'Hawthorn', 'Freemasons']"
-                label="Default Hospital"
-                clearable
+                v-model="selectedHospital"
+                :options="hospitalStore.hospitals"
+                label="Select Hospital"
+                option-label="hospital"
+                option-value="hospital_id"
+                map-options
+                emit-value
+                :rules="[(val) => !!val || 'Hospital selection is required']"
+                @update:model-value="onHospitalChange"
               />
 
+              <!-- Ward dropdown -->
               <q-select
                 filled
-                v-model="userSettings.defaultWard"
-                :options="[]"
-                label="Default Ward"
-                clearable
-                :disable="!userSettings.defaultHospital"
+                v-model="selectedWard"
+                :options="filteredWards"
+                label="Select Ward"
+                option-label="ward"
+                option-value="ward_id"
+                map-options
+                emit-value
+                :rules="[(val) => !!val || 'Ward selection is required']"
+                :disable="!selectedHospital"
+                @update:model-value="onWardChange"
+                :key="'ward-select-' + (selectedHospital || 'none')"
               />
 
-              <q-toggle v-model="userSettings.rememberSettings" label="Remember my settings" />
+              <q-toggle v-model="userSettings.autoSave" label="Auto save settings" />
 
               <div>
-                <q-btn 
-                  color="primary" 
-                  label="Save User Settings" 
-                  @click="saveUserSettings" 
-                  :disable="appSettings.autoSave"
-                >
-                  <q-tooltip v-if="appSettings.autoSave">
-                    Settings are automatically saved when auto-save is enabled
-                  </q-tooltip>
-                </q-btn>
-              </div>
-            </q-form>
-          </q-card-section>
-        </q-card>
-      </div>
-
-      <!-- Application Settings -->
-      <div class="col-12 col-md-6">
-        <q-card>
-          <q-card-section>
-            <div class="text-h6">Application Settings</div>
-
-            <q-form class="q-gutter-md q-mt-md">
-              <q-select
-                filled
-                v-model="appSettings.theme"
-                :options="themeOptions"
-                label="Application Theme"
-              />
-
-              <q-select
-                filled
-                v-model="appSettings.dateFormat"
-                :options="dateFormatOptions"
-                label="Date Format"
-              />
-
-              <q-toggle v-model="appSettings.notifications" label="Enable Notifications" />
-
-              <q-toggle v-model="appSettings.autoSave" label="Auto-save Settings">
-                <q-tooltip>
-                  When enabled, settings are automatically saved when changed
-                </q-tooltip>
-              </q-toggle>
-
-              <div>
-                <q-btn 
-                  color="primary" 
-                  label="Save App Settings" 
-                  @click="saveAppSettings" 
-                  :disable="appSettings.autoSave"
-                >
-                  <q-tooltip v-if="appSettings.autoSave">
-                    Settings are automatically saved when auto-save is enabled
-                  </q-tooltip>
-                </q-btn>
-
-                <q-btn
-                  color="secondary"
-                  flat
-                  label="Reset to Defaults"
-                  class="q-ml-sm"
-                  @click="resetAppSettings"
-                />
-              </div>
-            </q-form>
-          </q-card-section>
-        </q-card>
-      </div>
-
-      <!-- Data Management -->
-      <div class="col-12">
-        <q-card>
-          <q-card-section>
-            <div class="text-h6">Data Management</div>
-
-            <div class="row q-col-gutter-md q-mt-md">
-              <div class="col-12 col-md-4">
                 <q-btn
                   color="primary"
-                  label="Export All Data"
-                  icon="cloud_download"
-                  class="full-width"
-                />
+                  label="Save User Settings"
+                  @click="saveUserSettings"
+                  :disable="userSettings.autoSave"
+                >
+                  <q-tooltip v-if="appSettings.autoSave">
+                    Settings are automatically saved when auto-save is enabled
+                  </q-tooltip>
+                </q-btn>
               </div>
-
-              <div class="col-12 col-md-4">
-                <q-btn
-                  color="warning"
-                  label="Clear Local Cache"
-                  icon="delete_sweep"
-                  class="full-width"
-                />
-              </div>
-
-              <div class="col-12 col-md-4">
-                <q-btn
-                  color="negative"
-                  label="Reset Application"
-                  icon="restart_alt"
-                  class="full-width"
-                />
-              </div>
-            </div>
+            </q-form>
           </q-card-section>
         </q-card>
       </div>
@@ -144,27 +65,80 @@
 </template>
 
 <script setup>
+import { ref, onMounted, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import { useSettingsStore } from '../stores/settings-store'
+import { useHospitalStore } from '../stores/hospital-store'
 
 const $q = useQuasar()
 const settingsStore = useSettingsStore()
+const hospitalStore = useHospitalStore()
 
 // Use settings from the store
 const { userSettings, appSettings } = settingsStore
 
-// Options
-const themeOptions = [
-  { label: 'Blue Theme', value: 'blue' },
-  { label: 'Dark Theme', value: 'dark' },
-  { label: 'Light Theme', value: 'light' },
-]
+// Data
+const selectedHospital = ref(null)
+const selectedWard = ref(null)
 
-const dateFormatOptions = [
-  { label: 'YYYY-MM-DD', value: 'YYYY-MM-DD' },
-  { label: 'DD/MM/YYYY', value: 'DD/MM/YYYY' },
-  { label: 'MM/DD/YYYY', value: 'MM/DD/YYYY' },
-]
+// Computed property to filter wards based on selected hospital
+const filteredWards = computed(() => {
+  return hospitalStore.getFilteredWards(selectedHospital.value)
+})
+
+// Handle hospital selection change
+function onHospitalChange() {
+  // Reset ward selection when hospital changes
+  selectedWard.value = null
+  console.log('Selected hospital ID:', selectedHospital.value)
+
+  if (selectedHospital.value) {
+    const hospital = hospitalStore.getHospitalById(selectedHospital.value)
+    console.log('Hospital change details:', hospital)
+    if (hospital) {
+      userSettings.defaultHospital = hospital.hospital
+    }
+  }
+}
+
+function onWardChange() {
+  if (selectedWard.value) {
+    const ward = hospitalStore.getWardById(selectedWard.value)
+    if (ward) {
+      console.log('Ward being change: ', ward)
+      userSettings.defaultWard = ward.ward
+    }
+  }
+}
+
+// Fetch data when component is mounted
+onMounted(async () => {
+  // Initialize hospital and ward data
+  await hospitalStore.initializeData()
+
+  console.log('hospital store: ', hospitalStore.hospitals)
+  console.log('ward store: ', hospitalStore.wards)
+  // After fetching data, set the selected values based on stored settings
+  setTimeout(() => {
+    // Find the hospital ID that matches the stored hospital name
+    if (userSettings.defaultHospital) {
+      const hospital = hospitalStore.hospitals.find(
+        (h) => h.hospital === userSettings.defaultHospital,
+      )
+      if (hospital) {
+        selectedHospital.value = hospital.hospital_id
+      }
+    }
+
+    // Find the ward ID that matches the stored ward name
+    if (userSettings.defaultWard) {
+      const ward = hospitalStore.wards.find((w) => w.ward === userSettings.defaultWard)
+      if (ward) {
+        selectedWard.value = ward.ward_id
+      }
+    }
+  }, 500) // Small delay to ensure data is loaded
+})
 
 // Save settings functions
 const saveUserSettings = () => {
@@ -183,50 +157,6 @@ const saveUserSettings = () => {
       color: 'negative',
       icon: 'error',
       message: `Failed to save user settings: ${result.error}`,
-      position: 'top',
-      timeout: 2000,
-    })
-  }
-}
-
-const saveAppSettings = () => {
-  const result = settingsStore.saveAppSettings()
-
-  if (result.success) {
-    $q.notify({
-      color: 'positive',
-      icon: 'check_circle',
-      message: 'Application settings saved successfully',
-      position: 'top',
-      timeout: 2000,
-    })
-  } else {
-    $q.notify({
-      color: 'negative',
-      icon: 'error',
-      message: `Failed to save application settings: ${result.error}`,
-      position: 'top',
-      timeout: 2000,
-    })
-  }
-}
-
-const resetAppSettings = () => {
-  const result = settingsStore.resetAppSettings()
-
-  if (result.success) {
-    $q.notify({
-      color: 'info',
-      icon: 'info',
-      message: 'Application settings reset to defaults',
-      position: 'top',
-      timeout: 2000,
-    })
-  } else {
-    $q.notify({
-      color: 'negative',
-      icon: 'error',
-      message: `Failed to reset application settings: ${result.error}`,
       position: 'top',
       timeout: 2000,
     })
