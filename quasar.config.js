@@ -63,7 +63,6 @@ export default defineConfig((/* ctx */) => {
       vitePlugins: [
         [
           'vite-plugin-checker',
-          cloudflare(),
           {
             eslint: {
               lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{js,mjs,cjs,vue}"',
