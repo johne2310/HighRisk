@@ -1,3 +1,28 @@
+// const routes = [
+//   {
+//     path: '/',
+//     component: () => import('layouts/MainLayout.vue'),
+//     children: [
+//       { path: '', component: () => import('pages/IndexPage.vue') },
+//       { path: 'survey', component: () => import('pages/SurveyPage.vue') },
+//       { path: 'surveys', component: () => import('pages/SurveysListPage.vue') },
+//       { path: 'surveys/:id', component: () => import('pages/SurveyPage.vue') },
+//       { path: 'high-risk', component: () => import('pages/HighRiskPage.vue') },
+//       { path: 'settings', component: () => import('pages/SettingsPage.vue') },
+//       { path: 'help', component: () => import('pages/HelpPage.vue') },
+//     ],
+//   },
+//
+//   // Always leave this as last one,
+//   // but you can also remove it
+//   {
+//     path: '/:catchAll(.*)*',
+//     component: () => import('pages/ErrorNotFound.vue'),
+//   },
+// ]
+//
+// export default routes
+
 const routes = [
   {
     // path: '/login',
@@ -9,15 +34,16 @@ const routes = [
 
     // Redirect to home if already authenticated
     beforeEnter: async (to, from, next) => {
-      console.log('Route guard execution', to.path, from.path)
+      console.log('Route guard execution login', to.path, from.path)
 
       const authStoreModule = await import('src/stores/auth-store')
       const { useAuthStore } = authStoreModule
       const authStore = useAuthStore()
-      authStore.signOut()
       if (authStore.isAuthenticated) {
+        console.log('authenticated: ')
         next('/')
       } else {
+        console.log('not authenticated: ')
         next()
       }
     },
@@ -27,7 +53,7 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     meta: { requiresAuth: true },
     children: [
-      { path: '', component: () => import('pages/IndexPage.vue') },
+      { path: 'dashboard', component: () => import('pages/IndexPage.vue') },
       { path: 'survey', component: () => import('pages/SurveyPage.vue') },
       { path: 'surveys', component: () => import('pages/SurveysListPage.vue') },
       { path: 'surveys/:id', component: () => import('pages/SurveyPage.vue') },
@@ -50,13 +76,15 @@ const routes = [
   // },
   {
     path: '',
-    redirect: '/login', // Default redirect
+    redirect: '/dashboard', // Default redirect
     beforeEnter: async (to, from, next) => {
+      console.log('Route guard execution empty path', to.path, from.path)
       const authStoreModule = await import('src/stores/auth-store')
       const { useAuthStore } = authStoreModule
       const authStore = useAuthStore()
 
       if (authStore.isAuthenticated && !authStore.loading) {
+        console.log('authenticated: ')
         next('/')
       } else {
         next('/login')

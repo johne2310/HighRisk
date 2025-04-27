@@ -8,14 +8,9 @@
 
         <div class="q-mr-md">ver: {{ packageInfo.version }}</div>
 
-        <q-btn
-          flat
-          dense
-          icon="logout"
-          aria-label="Logout"
-          @click="handleLogout"
-          :loading="authStore.loading"
-        >
+        <div v-if="authStore.user" class="q-mr-sm">{{ authStore.user.email }}</div>
+
+        <q-btn flat dense icon="logout" aria-label="Logout" @click="handleLogout">
           <q-tooltip>Logout</q-tooltip>
         </q-btn>
       </q-toolbar>
@@ -52,7 +47,7 @@ const linksList = [
     title: 'Dashboard',
     caption: 'Overview of audit data',
     icon: 'dashboard',
-    link: '#/',
+    link: '#/dashboard',
   },
   {
     title: 'New Survey',

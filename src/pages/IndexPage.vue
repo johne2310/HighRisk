@@ -95,7 +95,7 @@ const surveyStore = useSurveyStore()
 
 // Fetch statistics when the component is mounted
 onMounted(async () => {
-  // await surveyStore.fetchStats()
+  await surveyStore.fetchStats()
   console.log('index  page onmounted called: ')
 })
 

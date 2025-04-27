@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
   // Actions
   // Initialize the store by checking for an existing session
   const initialize = async () => {
-    // loading.value = true
+    loading.value = true
     error.value = null
 
     try {
@@ -63,6 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
       if (signInError) throw signInError
 
       user.value = data.user
+      console.log('User is: ', user)
       return { success: true }
     } catch (err) {
       console.error('Error signing in:', err)

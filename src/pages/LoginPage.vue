@@ -126,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useAuthStore } from 'src/stores/auth-store'
@@ -225,12 +225,6 @@ const resetPassword = async () => {
     })
   }
 }
-
-onMounted(() => {
-  authStore.signOut()
-
-  router.push('/login')
-})
 </script>
 
 <style scoped>

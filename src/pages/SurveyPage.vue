@@ -71,7 +71,7 @@ const handleSubmit = async (formData) => {
   //   spinner: true,
   //   message: isEditing.value ? 'Updating audit data...' : 'Saving audit data...',
   //   position: 'top',
-  //   timeout: 0,
+  //   timeout: 1000,
   // })
 
   let result
@@ -91,7 +91,7 @@ const handleSubmit = async (formData) => {
   //   group: 'loading',
   //   timeout: 0,
   //   message: '',
-  //   position: 'top'
+  //   position: 'top',
   // })
 
   if (success) {
@@ -115,7 +115,7 @@ const handleSubmit = async (formData) => {
       icon: 'error',
       message: `Error ${isEditing.value ? 'updating' : 'saving'} data: ${error || 'Unknown error'}`,
       position: 'top',
-      timeout: 3000,
+      timeout: 2000,
     })
   }
 }

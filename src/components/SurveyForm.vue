@@ -67,6 +67,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useSettingsStore } from '../stores/settings-store'
+import { useAuthStore } from 'src/stores/auth-store'
 
 // Define props
 const props = defineProps({
@@ -78,6 +79,7 @@ const props = defineProps({
 
 // Get settings store
 const settingsStore = useSettingsStore()
+const authStore = useAuthStore()
 
 // Default form values
 const defaultForm = {
@@ -88,6 +90,7 @@ const defaultForm = {
   ward: '',
   hospital: '',
   isHighRisk: null,
+  user_Id: authStore.user.id,
 }
 
 // Form data
@@ -121,6 +124,7 @@ watch(
         ward: formData.ward || '',
         hospital: formData.hospital || '',
         isHighRisk: formData.isHighRisk !== undefined ? formData.isHighRisk : null,
+        user_Id: formData.user.id || authStore.user.id,
         // Include any other fields that might be in the original data
         ...formData,
       }
@@ -131,6 +135,7 @@ watch(
 
 // Load settings from settings store if available
 onMounted(() => {
+  console.log('uuser: ', authStore.user)
   // Only load defaults if we're not in edit mode
   if (!props.initialData) {
     // Load collector name from settings store if available
@@ -197,7 +202,9 @@ const resetForm = () => {
       bedNumber: formData.bedNumber || '',
       ward: formData.ward || '',
       hospital: formData.hospital || '',
-      // isHighRisk: formData.isHighRisk !== undefined ? formData.isHighRisk : null,
+      isHighRisk: formData.isHighRisk !== undefined ? formData.isHighRisk : null,
+      user_Id: authStore.user.id,
+
       // Include any other fields that might be in the original data
       ...formData,
     }

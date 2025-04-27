@@ -52,6 +52,7 @@ export default defineRouter(function (/* { store, ssrContext } */) {
       // Check if user is authenticated using the auth store
       if (!authStore.isAuthenticated) {
         // User is not authenticated, redirect to login
+        console.log('user is not authenticated: ')
         next({ path: '/login' })
       } else {
         // User is authenticated, proceed
