@@ -33,5 +33,35 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   })
 
+  // Navigation guard to check authentication
+  Router.beforeEach(async (to, from, next) => {
+    // Import auth store dynamically to avoid circular dependency
+    const authStoreModule = await import('src/stores/auth-store')
+    const { useAuthStore } = authStoreModule
+    const authStore = useAuthStore()
+
+    // Check if the route requires authentication
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+      // If auth store is still loading, wait for it
+      if (authStore.loading) {
+        // This will be handled by App.vue's loading state
+        next()
+        return
+      }
+
+      // Check if user is authenticated using the auth store
+      if (!authStore.isAuthenticated) {
+        // User is not authenticated, redirect to login
+        next({ path: '/login' })
+      } else {
+        // User is authenticated, proceed
+        next()
+      }
+    } else {
+      // Route does not require authentication
+      next()
+    }
+  })
+
   return Router
 })

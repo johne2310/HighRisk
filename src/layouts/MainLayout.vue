@@ -6,7 +6,18 @@
 
         <q-toolbar-title> High Risk Patient Audit</q-toolbar-title>
 
-        <div>ver: {{ packageInfo.version }}</div>
+        <div class="q-mr-md">ver: {{ packageInfo.version }}</div>
+
+        <q-btn
+          flat
+          dense
+          icon="logout"
+          aria-label="Logout"
+          @click="handleLogout"
+          :loading="authStore.loading"
+        >
+          <q-tooltip>Logout</q-tooltip>
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -26,8 +37,15 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
 import EssentialLink from 'components/EssentialLink.vue'
 import packageInfo from '../../package.json'
+import { useAuthStore } from 'src/stores/auth-store'
+
+const router = useRouter()
+const $q = useQuasar()
+const authStore = useAuthStore()
 
 const linksList = [
   {
@@ -74,10 +92,33 @@ function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value
 }
 
+async function handleLogout() {
+  try {
+    const { success, error } = await authStore.signOut()
 
+    if (success) {
+      $q.notify({
+        color: 'positive',
+        message: 'You have been logged out',
+        icon: 'check_circle',
+      })
+
+      // Redirect to login page
+      router.push('/login')
+    } else {
+      throw new Error(error || 'Logout failed')
+    }
+  } catch (error) {
+    $q.notify({
+      color: 'negative',
+      message: error.message || 'Logout failed',
+      icon: 'error',
+    })
+  }
+}
 </script>
 <style>
-  .item-header {
+.item-header {
   font-size: 20px;
 }
 </style>

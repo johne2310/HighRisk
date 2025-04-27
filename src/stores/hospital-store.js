@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import supabase from './supabase/index.js'
+import supabase from './supabase'
 
 export const useHospitalStore = defineStore('hospital', () => {
   // State

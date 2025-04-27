@@ -6,11 +6,7 @@
       <q-card-section>
         <div class="text-h6">
           Filters
-          <q-badge 
-            v-if="selectedHospital || selectedWard" 
-            color="primary" 
-            class="q-ml-sm"
-          >
+          <q-badge v-if="selectedHospital || selectedWard" color="primary" class="q-ml-sm">
             {{ (selectedHospital ? 1 : 0) + (selectedWard ? 1 : 0) }} active
           </q-badge>
         </div>
@@ -62,6 +58,14 @@
           <span v-if="filteredAudits.length !== surveyStore.audits.length">
             (Showing {{ filteredAudits.length }} of {{ surveyStore.audits.length }} records)
           </span>
+          <q-btn
+            color="primary"
+            icon="file_download"
+            label="Export to CSV"
+            class="float-right"
+            @click="exportToCSV"
+            :disable="!filteredAudits.length || surveyStore.loading"
+          />
         </div>
 
         <!-- Data table with audits from the store -->
@@ -71,7 +75,7 @@
           :columns="columns"
           row-key="id"
           :loading="surveyStore.loading"
-          :rows-per-page-options="[10,20,30,50]"
+          :rows-per-page-options="[10, 20, 30, 50]"
         >
           <template v-slot:loading>
             <q-inner-loading showing>
@@ -83,9 +87,10 @@
             <div class="full-width row flex-center q-gutter-sm q-pa-lg">
               <q-icon name="sentiment_dissatisfied" size="2rem" color="grey-7" />
               <span class="text-h6 text-grey-7">
-                {{ (selectedHospital || selectedWard) 
-                  ? 'No audit data matches the current filters' 
-                  : 'No audit data available yet' 
+                {{
+                  selectedHospital || selectedWard
+                    ? 'No audit data matches the current filters'
+                    : 'No audit data available yet'
                 }}
               </span>
               <q-btn
@@ -128,7 +133,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { useSurveyStore } from 'src/stores/survey-store'
-import { useQuasar } from 'quasar'
+import { useQuasar, exportFile } from 'quasar'
 import { onMounted, onUnmounted, ref, computed } from 'vue'
 
 const $q = useQuasar()
@@ -141,11 +146,11 @@ const selectedWard = ref(null)
 
 // Get unique hospitals and wards for filter dropdowns
 const hospitals = computed(() => {
-  const uniqueHospitals = [...new Set(surveyStore.audits.map(audit => audit.hospital))]
+  const uniqueHospitals = [...new Set(surveyStore.audits.map((audit) => audit.hospital))]
   return uniqueHospitals
     .filter(Boolean) // Remove empty values
     .sort() // Sort alphabetically
-    .map(hospital => ({ label: hospital, value: hospital })) // Format for q-select
+    .map((hospital) => ({ label: hospital, value: hospital })) // Format for q-select
 })
 
 const wards = computed(() => {
@@ -154,15 +159,15 @@ const wards = computed(() => {
   // If hospital is selected, only show wards from that hospital
   if (selectedHospital.value) {
     const hospitalAudits = surveyStore.getAuditsByHospital(selectedHospital.value)
-    uniqueWards = [...new Set(hospitalAudits.map(audit => audit.ward))]
+    uniqueWards = [...new Set(hospitalAudits.map((audit) => audit.ward))]
   } else {
-    uniqueWards = [...new Set(surveyStore.audits.map(audit => audit.ward))]
+    uniqueWards = [...new Set(surveyStore.audits.map((audit) => audit.ward))]
   }
 
   return uniqueWards
     .filter(Boolean) // Remove empty values
     .sort() // Sort alphabetically
-    .map(ward => ({ label: ward, value: ward })) // Format for q-select
+    .map((ward) => ({ label: ward, value: ward })) // Format for q-select
 })
 
 // Filtered audits based on selected filters
@@ -174,7 +179,7 @@ const filteredAudits = computed(() => {
   }
 
   if (selectedWard.value) {
-    result = result.filter(audit => audit.ward === selectedWard.value)
+    result = result.filter((audit) => audit.ward === selectedWard.value)
   }
 
   return result
@@ -195,6 +200,64 @@ onMounted(async () => {
 onUnmounted(() => {
   surveyStore.unsubscribeFromRealtimeUpdates()
 })
+
+// Function to export audits to CSV
+const exportToCSV = () => {
+  // Helper function to properly format CSV fields
+  const wrapCsvValue = (val) => {
+    let formatted = val !== null && val !== undefined ? String(val) : ''
+
+    // Double quotes need to be doubled
+    formatted = formatted.replace(/"/g, '""')
+
+    // Wrap in quotes if the value contains commas, quotes, or newlines
+    if (formatted.includes(',') || formatted.includes('"') || formatted.includes('\n')) {
+      formatted = `"${formatted}"`
+    }
+
+    return formatted
+  }
+
+  // Define the column headers for the CSV (excluding the actions column)
+  const csvColumns = columns
+    .filter((col) => col.name !== 'actions')
+    .map((col) => wrapCsvValue(col.label))
+
+  // Create CSV content with headers
+  let csvContent = csvColumns.join(',') + '\n'
+
+  // Add data rows
+  filteredAudits.value.forEach((row) => {
+    const rowData = [
+      wrapCsvValue(row.auditDate),
+      wrapCsvValue(row.collectorName),
+      wrapCsvValue(row.patientId),
+      wrapCsvValue(row.bedNumber),
+      wrapCsvValue(row.ward),
+      wrapCsvValue(row.hospital),
+      wrapCsvValue(row.isHighRisk ? 'Yes' : 'No'),
+    ]
+    csvContent += rowData.join(',') + '\n'
+  })
+
+  // Use Quasar's exportFile utility to download the CSV
+  const status = exportFile('patient_medication_audits.csv', csvContent, 'text/csv')
+
+  // Use the Quasar Notify plugin to show success or error message
+  if (status === true) {
+    $q.notify({
+      color: 'positive',
+      message: 'Audit data exported successfully',
+      icon: 'file_download',
+    })
+  } else {
+    $q.notify({
+      color: 'negative',
+      message: 'Export failed - browser denied file download',
+      icon: 'error',
+    })
+  }
+}
 
 // Edit an audit
 const editAudit = (id) => {
