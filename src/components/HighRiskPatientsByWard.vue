@@ -13,7 +13,7 @@
           :disable="!wardStats.length || loading"
         />
       </div>
-
+      <br />
       <q-table
         title="Ward Statistics"
         :rows="wardStats"
