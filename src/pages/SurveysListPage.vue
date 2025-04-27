@@ -67,7 +67,7 @@
             :disable="!filteredAudits.length || surveyStore.loading"
           />
         </div>
-
+        <br />
         <!-- Data table with audits from the store -->
         <q-table
           title="Patient Medication Audits"

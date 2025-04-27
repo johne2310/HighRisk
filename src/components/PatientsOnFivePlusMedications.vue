@@ -5,7 +5,6 @@
       <div class="text-subtitle2 q-mb-md">
         Patients taking 5 or more regular medications are considered high risk
       </div>
-      <br />
       <!-- Data table with high-risk audits from the store -->
       <q-table
         title="High Risk Patients"
