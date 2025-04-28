@@ -1,33 +1,7 @@
-// const routes = [
-//   {
-//     path: '/',
-//     component: () => import('layouts/MainLayout.vue'),
-//     children: [
-//       { path: '', component: () => import('pages/IndexPage.vue') },
-//       { path: 'survey', component: () => import('pages/SurveyPage.vue') },
-//       { path: 'surveys', component: () => import('pages/SurveysListPage.vue') },
-//       { path: 'surveys/:id', component: () => import('pages/SurveyPage.vue') },
-//       { path: 'high-risk', component: () => import('pages/HighRiskPage.vue') },
-//       { path: 'settings', component: () => import('pages/SettingsPage.vue') },
-//       { path: 'help', component: () => import('pages/HelpPage.vue') },
-//     ],
-//   },
-//
-//   // Always leave this as last one,
-//   // but you can also remove it
-//   {
-//     path: '/:catchAll(.*)*',
-//     component: () => import('pages/ErrorNotFound.vue'),
-//   },
-// ]
-//
 // export default routes
 
 const routes = [
   {
-    // path: '/login',
-    // component: () => import('pages/LoginPage.vue'),
-
     path: '/login',
     component: () => import('layouts/AuthLayout.vue'),
     children: [{ path: '', component: () => import('pages/LoginPage.vue') }],
@@ -63,20 +37,9 @@ const routes = [
     ],
   },
 
-  // Redirect root to login if not authenticated
-  // {
-  //   path: '',
-  //   redirect: async () => {
-  //     const authStoreModule = await import('src/stores/auth-store')
-  //     const { useAuthStore } = authStoreModule
-  //     const authStore = useAuthStore()
-  //
-  //     return authStore.isAuthenticated ? '/' : '/login'
-  //   },
-  // },
   {
     path: '',
-    redirect: '/dashboard', // Default redirect
+    redirect: '/login', // Default redirect
     beforeEnter: async (to, from, next) => {
       console.log('Route guard execution empty path', to.path, from.path)
       const authStoreModule = await import('src/stores/auth-store')
@@ -85,9 +48,9 @@ const routes = [
 
       if (authStore.isAuthenticated && !authStore.loading) {
         console.log('authenticated: ')
-        next('/')
+        next('/dashboard')
       } else {
-        next('/login')
+        next()
       }
     },
   },

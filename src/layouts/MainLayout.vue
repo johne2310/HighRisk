@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import EssentialLink from 'components/EssentialLink.vue'
@@ -41,6 +41,10 @@ import { useAuthStore } from 'src/stores/auth-store'
 const router = useRouter()
 const $q = useQuasar()
 const authStore = useAuthStore()
+
+onMounted(async () => {
+  await authStore.initialize()
+})
 
 const linksList = [
   {
@@ -99,7 +103,7 @@ async function handleLogout() {
       })
 
       // Redirect to login page
-      router.push('/login')
+      await router.push('/login')
     } else {
       throw new Error(error || 'Logout failed')
     }

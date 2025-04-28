@@ -7,7 +7,7 @@ import {
   getAuditStats,
   updateAudit,
   deleteAudit,
-  subscribeToAudits
+  subscribeToAudits,
 } from './supabase'
 
 export const useSurveyStore = defineStore('survey', () => {
@@ -60,16 +60,15 @@ export const useSurveyStore = defineStore('survey', () => {
         }
         // Refresh stats
         fetchStats()
-      } 
-      else if (eventType === 'UPDATE') {
+      } else if (eventType === 'UPDATE') {
         // Update the existing record in the audits array
-        const index = audits.value.findIndex(audit => audit.id === newRecord.id)
+        const index = audits.value.findIndex((audit) => audit.id === newRecord.id)
         if (index !== -1) {
           audits.value[index] = newRecord
         }
 
         // Update high-risk audits if applicable
-        const highRiskIndex = highRiskAudits.value.findIndex(audit => audit.id === newRecord.id)
+        const highRiskIndex = highRiskAudits.value.findIndex((audit) => audit.id === newRecord.id)
         if (newRecord.isHighRisk && highRiskIndex === -1) {
           // Add to high-risk if it wasn't there before
           highRiskAudits.value = [newRecord, ...highRiskAudits.value]
@@ -83,12 +82,11 @@ export const useSurveyStore = defineStore('survey', () => {
 
         // Refresh stats
         fetchStats()
-      } 
-      else if (eventType === 'DELETE') {
+      } else if (eventType === 'DELETE') {
         // Remove the record from the audits array
-        audits.value = audits.value.filter(audit => audit.id !== oldRecord.id)
+        audits.value = audits.value.filter((audit) => audit.id !== oldRecord.id)
         // Remove from high-risk audits if applicable
-        highRiskAudits.value = highRiskAudits.value.filter(audit => audit.id !== oldRecord.id)
+        highRiskAudits.value = highRiskAudits.value.filter((audit) => audit.id !== oldRecord.id)
         // Refresh stats
         fetchStats()
       }
@@ -248,6 +246,6 @@ export const useSurveyStore = defineStore('survey', () => {
     editAudit,
     removeAudit,
     subscribeToRealtimeUpdates,
-    unsubscribeFromRealtimeUpdates
+    unsubscribeFromRealtimeUpdates,
   }
 })

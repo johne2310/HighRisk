@@ -20,6 +20,7 @@
         :columns="wardColumns"
         row-key="ward"
         :loading="loading"
+        :rows-per-page-options="[10, 20, 30, 50]"
       >
         <template v-slot:loading>
           <q-inner-loading showing>

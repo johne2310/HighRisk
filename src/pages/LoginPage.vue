@@ -33,13 +33,7 @@
           </q-input>
 
           <div class="q-mt-md">
-            <q-btn
-              label="Sign In"
-              type="submit"
-              color="primary"
-              class="full-width"
-              :loading="loading"
-            />
+            <q-btn label="Sign In" type="submit" color="primary" class="full-width" />
           </div>
 
           <div class="text-center q-mt-sm">
@@ -166,7 +160,7 @@ const handleLogin = async () => {
     })
 
     // Redirect to home page
-    router.push('/')
+    router.push('/dashboard')
   } else {
     // Login failed
     $q.notify({

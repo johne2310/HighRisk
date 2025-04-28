@@ -51,7 +51,7 @@
                   @click="saveUserSettings"
                   :disable="userSettings.autoSave"
                 >
-                  <q-tooltip v-if="appSettings.autoSave">
+                  <q-tooltip v-if="userSettings.autoSave">
                     Settings are automatically saved when auto-save is enabled
                   </q-tooltip>
                 </q-btn>
@@ -75,7 +75,7 @@ const settingsStore = useSettingsStore()
 const hospitalStore = useHospitalStore()
 
 // Use settings from the store
-const { userSettings, appSettings } = settingsStore
+const { userSettings } = settingsStore
 
 // Data
 const selectedHospital = ref(null)
