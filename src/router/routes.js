@@ -15,7 +15,7 @@ const routes = [
       const authStore = useAuthStore()
       if (authStore.isAuthenticated) {
         console.log('authenticated: ')
-        next('/')
+        next('/dashboard')
       } else {
         console.log('not authenticated: ')
         next()
