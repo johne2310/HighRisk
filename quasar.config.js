@@ -2,7 +2,10 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers'
-import { cloudflare } from '@cloudflare/vite-plugin'
+import * as dotenv from 'dotenv'
+dotenv.config()
+
+
 
 export default defineConfig((/* ctx */) => {
   return {

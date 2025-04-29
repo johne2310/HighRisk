@@ -1,6 +1,6 @@
 {
   "name": "high-risk-patient-audit",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "description": "An app for audting high risk patient count",
   "productName": "High Risk Patient Audit",
   "author": "johne2310 <john@day41.com.au>",
@@ -31,6 +31,7 @@
     "@quasar/app-vite": "^2.1.0",
     "@vue/eslint-config-prettier": "^10.1.0",
     "autoprefixer": "^10.4.2",
+    "dotenv": "^16.5.0",
     "eslint": "^9.14.0",
     "eslint-plugin-vue": "^9.30.0",
     "globals": "^15.12.0",
