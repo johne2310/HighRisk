@@ -6,9 +6,9 @@ import { createClient } from '@supabase/supabase-js'
 
 
 console.log('Supabase URL: ', import.meta.env.VITE_SUPABASE_URL)
-console.log('Supabase KEY: ', import.meta.env.VITE_SUPABASE_KEY)
+console.log('Supabase KEY: ', import.meta.env.VITE_SUPABASE_LINK)
 
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
+const supabaseKey = import.meta.env.VITE_SUPABASE_LINK
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 
 // const supabaseUrl = 'https://lmvvkbraxtmilcpxbijt.supabase.co' // e.g., 'https://yourproject.supabase.co'

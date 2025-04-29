@@ -1,6 +1,6 @@
 {
   "name": "high-risk-patient-audit",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "description": "An app for audting high risk patient count",
   "productName": "High Risk Patient Audit",
   "author": "johne2310 <john@day41.com.au>",
