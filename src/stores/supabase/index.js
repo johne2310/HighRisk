@@ -4,10 +4,12 @@ import { createClient } from '@supabase/supabase-js'
 // Replace these with your own Supabase project URL and anon key
 // You can find these in your Supabase project settings > API
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL
+
 console.log('Supabase URL: ', import.meta.env.VITE_SUPABASE_URL)
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY
-console.log('Supabase KEY: ', import.meta.env.VITE_SUPABASE_ANON_KEY)
+console.log('Supabase KEY: ', import.meta.env.VITE_SUPABASE_KEY)
+
+const supabaseKey = process.env.VITE_SUPABASE_KEY
+const supabaseUrl = process.env.VITE_SUPABASE_URL
 
 
 // const supabaseUrl = 'https://lmvvkbraxtmilcpxbijt.supabase.co' // e.g., 'https://yourproject.supabase.co'
