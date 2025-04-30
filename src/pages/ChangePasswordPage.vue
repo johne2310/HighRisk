@@ -58,6 +58,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from 'src/stores/auth-store'
 import { useQuasar } from 'quasar'
+import supabase from './supabase'
 
 const newPassword = ref('')
 const confirmPassword = ref('')
@@ -78,9 +79,14 @@ const handleChangePassword = async () => {
 
   try {
     // Call Supabase to update the password
-    const { error: updateError } = await authStore.supabase.auth.updateUser({
+
+    const { error: updateError } = await supabase.auth.updateUser({
       password: newPassword.value,
     })
+
+    // const { error: updateError } = await authStore.supabase.auth.updateUser({
+    //   password: newPassword.value,
+    // })
 
     if (updateError) {
       throw new Error(updateError.message)
