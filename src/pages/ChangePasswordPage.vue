@@ -74,6 +74,8 @@ const handleChangePassword = async () => {
   error.value = null
   successMessage.value = null
 
+  console.log('New Password: ', newPassword.value)
+
   try {
     // Call Supabase to update the password
     const { error: updateError } = await authStore.supabase.auth.updateUser({
