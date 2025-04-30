@@ -56,9 +56,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from 'src/stores/auth-store'
+// import { useAuthStore } from 'src/stores/auth-store'
 import { useQuasar } from 'quasar'
-import supabase from './supabase'
+import supabase from '../stores/supabase'
 
 const newPassword = ref('')
 const confirmPassword = ref('')
@@ -67,7 +67,7 @@ const error = ref(null)
 const successMessage = ref(null)
 
 const router = useRouter()
-const authStore = useAuthStore()
+// const authStore = useAuthStore()
 const $q = useQuasar()
 
 const handleChangePassword = async () => {
