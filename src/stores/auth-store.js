@@ -5,7 +5,7 @@ import supabase from './supabase'
 export const useAuthStore = defineStore('auth', () => {
   // State
   const user = ref(null)
-  const loading = ref(true)
+  const loading = ref(false)
   const error = ref(null)
 
   // Getters
@@ -83,6 +83,9 @@ export const useAuthStore = defineStore('auth', () => {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: 'https://www.day41.app/#/login',
+        },
       })
 
       if (signUpError) throw signUpError
@@ -124,7 +127,9 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email)
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://www.day41.app/#/change-passwor',
+      })
 
       if (resetError) throw resetError
 

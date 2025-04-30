@@ -25,15 +25,58 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    meta: { requiresAuth: true },
+
     children: [
-      { path: 'dashboard', component: () => import('pages/IndexPage.vue') },
-      { path: 'survey', component: () => import('pages/SurveyPage.vue') },
-      { path: 'surveys', component: () => import('pages/SurveysListPage.vue') },
-      { path: 'surveys/:id', component: () => import('pages/SurveyPage.vue') },
-      { path: 'high-risk', component: () => import('pages/HighRiskPage.vue') },
-      { path: 'settings', component: () => import('pages/SettingsPage.vue') },
-      { path: 'help', component: () => import('pages/HelpPage.vue') },
+      {
+        path: 'dashboard',
+        component: () => import('pages/IndexPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'survey',
+        component: () => import('pages/SurveyPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'surveys',
+        component: () => import('pages/SurveysListPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'surveys/:id',
+        component: () => import('pages/SurveyPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'high-risk',
+        component: () => import('pages/HighRiskPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'settings',
+        component: () => import('pages/SettingsPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'help',
+        component: () => import('pages/HelpPage.vue'),
+        meta: { requiresAuth: true },
+      },
+    ],
+  },
+  {
+    path: '/',
+    component: () => import('layouts/AuthLayout.vue'),
+    children: [
+      {
+        path: 'reset-password',
+        component: () => import('pages/ResetPasswordPage.vue'),
+        meta: { requiresAuth:false },
+      },
+      {
+        path: 'change-password',
+        component: () => import('pages/ChangePasswordPage.vue'),
+        meta: { requiresAuth:false },      ,
     ],
   },
 

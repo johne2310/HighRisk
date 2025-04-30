@@ -33,7 +33,13 @@
           </q-input>
 
           <div class="q-mt-md">
-            <q-btn label="Sign In" type="submit" color="primary" class="full-width" />
+            <q-btn
+              label="Sign In"
+              type="submit"
+              color="primary"
+              class="full-width"
+              :loading="loading"
+            />
           </div>
 
           <div class="text-center q-mt-sm">
@@ -41,7 +47,7 @@
               flat
               color="primary"
               label="Forgot Password?"
-              @click="resetPassword"
+              @click="gotoResetPassword"
               :disable="loading"
             />
           </div>
@@ -147,6 +153,11 @@ const isValidEmail = (val) => {
   return emailPattern.test(val) || 'Invalid email format'
 }
 
+//go to password reset page
+const gotoResetPassword = () => {
+  router.push('/reset-password')
+}
+
 // Handle login
 const handleLogin = async () => {
   const { success, error } = await authStore.signIn(email.value, password.value)
@@ -160,7 +171,7 @@ const handleLogin = async () => {
     })
 
     // Redirect to home page
-    router.push('/dashboard')
+    await router.push('/dashboard')
   } else {
     // Login failed
     $q.notify({
@@ -193,32 +204,32 @@ const handleSignUp = async () => {
 }
 
 // Handle password reset
-const resetPassword = async () => {
-  if (!email.value) {
-    $q.notify({
-      color: 'warning',
-      message: 'Please enter your email address',
-      icon: 'warning',
-    })
-    return
-  }
-
-  const { success, error } = await authStore.resetPassword(email.value)
-
-  if (success) {
-    $q.notify({
-      color: 'positive',
-      message: 'Password reset email sent. Please check your inbox.',
-      icon: 'check_circle',
-    })
-  } else {
-    $q.notify({
-      color: 'negative',
-      message: error || 'Failed to send reset email',
-      icon: 'error',
-    })
-  }
-}
+// const resetPassword = async () => {
+//   if (!email.value) {
+//     $q.notify({
+//       color: 'warning',
+//       message: 'Please enter your email address',
+//       icon: 'warning',
+//     })
+//     return
+//   }
+//
+//   const { success, error } = await authStore.resetPassword(email.value)
+//
+//   if (success) {
+//     $q.notify({
+//       color: 'positive',
+//       message: 'Password reset email sent. Please check your inbox.',
+//       icon: 'check_circle',
+//     })
+//   } else {
+//     $q.notify({
+//       color: 'negative',
+//       message: error || 'Failed to send reset email',
+//       icon: 'error',
+//     })
+//   }
+// }
 </script>
 
 <style scoped>
