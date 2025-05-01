@@ -65,6 +65,7 @@ const routes = [
          {
         path: 'change-password',
         component: () => import('pages/ChangePasswordPage.vue'),
+        meta: { requiresAuth: true },
       },
     ],
   },
