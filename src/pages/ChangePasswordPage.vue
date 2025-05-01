@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 // import { useAuthStore } from 'src/stores/auth-store'
 import { useQuasar } from 'quasar'
@@ -69,6 +69,23 @@ const successMessage = ref(null)
 const router = useRouter()
 // const authStore = useAuthStore()
 const $q = useQuasar()
+
+onMounted(() => {
+  console.log('Change Password Page')
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_IN') {
+      console.log('Signed in')
+    } else if (event === 'SIGNED_OUT') {
+      console.log('Signed out')
+    } else if (event === 'PASSWORD_RECOVERY') {
+      console.log('Password recovery')
+    } else if (event === 'EMAIL_VERIFICATION') {
+      console.log('Email verification')
+    } else if (event === 'USER_UPDATED') {
+      console.log('User updated')
+    }
+  })
+})
 
 const handleChangePassword = async () => {
   loading.value = true
@@ -101,7 +118,7 @@ const handleChangePassword = async () => {
 
     // Redirect to login after a short delay
     setTimeout(() => {
-      router.push('/login')
+      router.push('/dashboard')
     }, 2000) // Adjust the delay as needed
   } catch (err) {
     error.value = err.message || 'An unexpected error occurred.'

@@ -62,6 +62,11 @@ const routes = [
         component: () => import('pages/HelpPage.vue'),
         meta: { requiresAuth: true },
       },
+         {
+        path: 'change-password',
+        component: () => import('pages/ChangePasswordPage.vue'),
+        meta: { requiresAuth: true },
+      },
     ],
   },
   {
@@ -73,11 +78,7 @@ const routes = [
         component: () => import('pages/ResetPasswordPage.vue'),
         meta: { requiresAuth: false },
       },
-      {
-        path: 'change-password',
-        component: () => import('pages/ChangePasswordPage.vue'),
-        meta: { requiresAuth: false },
-      },
+
     ],
   },
 

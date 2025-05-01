@@ -46,6 +46,18 @@ export const useAuthStore = defineStore('auth', () => {
       } else {
         user.value = null
       }
+      if (event === 'SIGNED_IN') {
+        console.log('Signed in')
+      }
+      if (event === 'SIGNED_OUT') {
+        console.log('Signed out')
+      }
+      if (event === 'PASSWORD_RECOVERY') {
+        console.log('Password recovery')
+      }
+      if (event === 'EMAIL_VERIFICATION') {
+        console.log('Email verification')
+      }
     })
   }
 
@@ -85,6 +97,7 @@ export const useAuthStore = defineStore('auth', () => {
         password,
         options: {
           emailRedirectTo: 'https://www.day41.app/#/login',
+
         },
       })
 
@@ -128,7 +141,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.day41.app/#/change-password',
+        redirectTo: 'https://www.day41.apps/#/change-password',
       })
 
       if (resetError) throw resetError
