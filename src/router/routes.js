@@ -62,7 +62,6 @@ const routes = [
         component: () => import('pages/HelpPage.vue'),
         meta: { requiresAuth: true },
       },
-
     ],
   },
   {
@@ -77,9 +76,8 @@ const routes = [
       {
         path: 'change-password',
         component: () => import('pages/ChangePasswordPage.vue'),
-
+        meta: { requiresAuth: true },
       },
-
     ],
   },
 
