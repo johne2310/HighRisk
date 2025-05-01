@@ -96,6 +96,7 @@ const handleChangePassword = async () => {
 
   try {
     // Call Supabase to update the password
+    await supabase.auth.getSession()
 
     const { error: updateError } = await supabase.auth.updateUser({
       password: newPassword.value,
