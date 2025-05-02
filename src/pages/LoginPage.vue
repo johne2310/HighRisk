@@ -16,7 +16,7 @@
             :rules="[(val) => !!val || 'Email is required', isValidEmail]"
           />
 
-          <q-input
+          <!--          <q-input
             v-model="password"
             label="Password"
             :type="isPwd ? 'password' : 'text'"
@@ -28,9 +28,9 @@
                 :name="isPwd ? 'visibility_off' : 'visibility'"
                 class="cursor-pointer"
                 @click="isPwd = !isPwd"
-              />
+               />
             </template>
-          </q-input>
+          </q-input>-->
 
           <div class="q-mt-md">
             <q-btn
@@ -137,8 +137,8 @@ const authStore = useAuthStore()
 
 // Login form
 const email = ref('')
-const password = ref('')
-const isPwd = ref(true)
+// const password = ref('')
+// const isPwd = ref(true)
 const loading = computed(() => authStore.loading)
 
 // Sign up form

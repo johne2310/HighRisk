@@ -64,6 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
   //sign in using magic link
   async function signInWithMagicLink(email) {
     try {
+      console.log('magic email: ', email)
       const { data, error } = await supabase.auth.signInWithOtp({
         email: email,
         options: {
@@ -80,7 +81,7 @@ export const useAuthStore = defineStore('auth', () => {
         return { success: false, error: error.message }
       }
 
-      console.log('Magic link sent successfully!')
+      console.log('Magic link sent successfully! Refer email to sign in.')
       return { success: true, data: data }
     } catch (error) {
       console.error('Unexpected error:', error.message)
@@ -166,7 +167,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        // redirectTo: 'https://www.day41.app/#/change-password',
+        redirectTo: 'https://www.day41.app/#/change-password',
       })
 
       if (resetError) throw resetError
