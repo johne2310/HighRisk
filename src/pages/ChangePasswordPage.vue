@@ -94,7 +94,7 @@ const handleChangePassword = async () => {
 
   console.log('New Password: ', newPassword.value)
   const accessToken = route.query.access_token
-
+  if (accessToken) console.log('Access token: ', accessToken)
   try {
     if (accessToken) console.log('Access token: ', accessToken)
     // Call Supabase to update the password
