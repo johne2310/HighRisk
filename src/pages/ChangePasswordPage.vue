@@ -71,20 +71,18 @@ const authStore = useAuthStore()
 const $q = useQuasar()
 
 onMounted(() => {
-  console.log('Change Password Page')
-  authStore.supabase.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_IN') {
-      console.log('Signed in')
-    } else if (event === 'SIGNED_OUT') {
-      console.log('Signed out')
-    } else if (event === 'PASSWORD_RECOVERY') {
-      console.log('Password recovery')
-    } else if (event === 'EMAIL_VERIFICATION') {
-      console.log('Email verification')
-    } else if (event === 'USER_UPDATED') {
-      console.log('User updated')
+  onMounted(() => {
+    const accessToken = route.query.access_token || route.params.access_token // Adjust key as needed
+    if (accessToken) {
+      // Use the access token
+      console.log('Access Token:', accessToken)
+      // Store it in Vuex, local storage, or use it to make API requests
+    } else {
+      console.warn('Access token not found in URL.')
     }
   })
+
+  console.log('Change Password Page')
 })
 
 const handleChangePassword = async () => {
@@ -94,7 +92,11 @@ const handleChangePassword = async () => {
 
   console.log('New Password: ', newPassword.value)
   const accessToken = route.query.access_token
-  if (accessToken) console.log('Access token: ', accessToken)
+  if (accessToken) {
+    console.log('Access token: ', accessToken)
+  } else {
+    console.log('no access token: ')
+  }
   try {
     if (accessToken) console.log('Access token: ', accessToken)
     // Call Supabase to update the password
