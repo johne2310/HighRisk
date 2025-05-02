@@ -41,11 +41,6 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Set up auth state change listener
     supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        user.value = session.user
-      } else {
-        user.value = null
-      }
       if (event === 'SIGNED_IN') {
         console.log('Signed in')
       }
@@ -57,6 +52,11 @@ export const useAuthStore = defineStore('auth', () => {
       }
       if (event === 'EMAIL_VERIFICATION') {
         console.log('Email verification')
+      }
+      if (session) {
+        user.value = session.user
+      } else {
+        user.value = null
       }
     })
   }
@@ -139,7 +139,8 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.day41.app/#/change-password',
+        // redirectTo: 'https://www.day41.app/#/change-password',
+        redirectTo: `${window.location.origin}/change-password`,
       })
 
       if (resetError) throw resetError

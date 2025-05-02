@@ -55,10 +55,9 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-// import { useAuthStore } from 'src/stores/auth-store'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from 'src/stores/auth-store'
 import { useQuasar } from 'quasar'
-import supabase from '../stores/supabase'
 
 const newPassword = ref('')
 const confirmPassword = ref('')
@@ -67,12 +66,13 @@ const error = ref(null)
 const successMessage = ref(null)
 
 const router = useRouter()
-// const authStore = useAuthStore()
+const route = useRoute()
+const authStore = useAuthStore()
 const $q = useQuasar()
 
 onMounted(() => {
   console.log('Change Password Page')
-  supabase.auth.onAuthStateChange((event) => {
+  authStore.supabase.auth.onAuthStateChange((event) => {
     if (event === 'SIGNED_IN') {
       console.log('Signed in')
     } else if (event === 'SIGNED_OUT') {
@@ -93,18 +93,14 @@ const handleChangePassword = async () => {
   successMessage.value = null
 
   console.log('New Password: ', newPassword.value)
+  const accessToken = route.query.access_token
 
   try {
+    if (accessToken) console.log('Access token: ', accessToken)
     // Call Supabase to update the password
-    await supabase.auth.getSession()
-
-    const { error: updateError } = await supabase.auth.updateUser({
+    const { error: updateError } = await authStore.supabase.auth.updateUser({
       password: newPassword.value,
     })
-
-    // const { error: updateError } = await authStore.supabase.auth.updateUser({
-    //   password: newPassword.value,
-    // })
 
     if (updateError) {
       throw new Error(updateError.message)

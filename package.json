@@ -1,6 +1,6 @@
 {
   "name": "high-risk-patient-audit",
-  "version": "0.0.48",
+  "version": "0.0.49",
   "description": "An app for auditing high risk patient count",
   "productName": "High Risk Patient Audit",
   "author": "johne2310 <john@day41.com.au>",
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.16.4",
+    "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.39.7",
     "axios": "^1.2.1",
     "pinia": "^3.0.1",
