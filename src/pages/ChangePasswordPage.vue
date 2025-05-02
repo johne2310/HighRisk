@@ -71,17 +71,14 @@ const authStore = useAuthStore()
 const $q = useQuasar()
 
 onMounted(() => {
-  onMounted(() => {
-    const accessToken = route.query.access_token || route.params.access_token // Adjust key as needed
-    if (accessToken) {
-      // Use the access token
-      console.log('Access Token:', accessToken)
-      // Store it in Vuex, local storage, or use it to make API requests
-    } else {
-      console.warn('Access token not found in URL.')
-    }
-  })
-
+  const accessToken = route.query.access_token || route.params.access_token // Adjust key as needed
+  if (accessToken) {
+    // Use the access token
+    console.log('Access Token:', accessToken)
+    // Store it in Vuex, local storage, or use it to make API requests
+  } else {
+    console.warn('Access token not found in URL.')
+  }
   console.log('Change Password Page')
 })
 
