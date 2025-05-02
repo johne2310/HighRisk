@@ -61,6 +61,33 @@ export const useAuthStore = defineStore('auth', () => {
     })
   }
 
+  //sign in using magic link
+  async function signInWithMagicLink(email) {
+    try {
+      const { data, error } = await supabase.auth.signInWithOtp({
+        email: email,
+        options: {
+          // Set to true if you want to redirect the user to an app screen rather than the "auth/v1/verify" page
+          shouldCreateUser: false,
+          // If `localhost` is verified, the email won't be sent, and the user will be automatically signed in.
+          // This is intended for testing purposes.
+          emailRedirectTo: 'https://www.day41.app/#/dashboard',
+        },
+      })
+
+      if (error) {
+        console.error('Error sending magic link:', error.message)
+        return { success: false, error: error.message }
+      }
+
+      console.log('Magic link sent successfully!')
+      return { success: true, data: data }
+    } catch (error) {
+      console.error('Unexpected error:', error.message)
+      return { success: false, error: error.message }
+    }
+  }
+
   // Sign in with email and password
   const signIn = async (email, password) => {
     loading.value = true
@@ -169,5 +196,6 @@ export const useAuthStore = defineStore('auth', () => {
     signUp,
     signOut,
     resetPassword,
+    signInWithMagicLink,
   }
 })

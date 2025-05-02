@@ -160,7 +160,7 @@ const gotoResetPassword = () => {
 
 // Handle login
 const handleLogin = async () => {
-  const { success, error } = await authStore.signIn(email.value, password.value)
+  const { success, error } = await authStore.signInWithMagicLink(email.value)
 
   if (success) {
     // Successful login
