@@ -6,6 +6,7 @@ import {
   createWebHashHistory,
 } from 'vue-router'
 import routes from './routes'
+import supabase from 'src/stores/supabase/index'
 
 /*
  * If not building with SSR mode, you can
@@ -33,8 +34,41 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   })
 
-  // Navigation guard to check authentication
+  // Handle magic link authentication
   Router.beforeEach(async (to, from, next) => {
+    // Check if the URL contains Supabase auth parameters
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+    const queryParams = new URLSearchParams(window.location.search)
+
+    // Look for auth parameters in both hash and query parameters
+    const accessToken = hashParams.get('access_token') || queryParams.get('access_token')
+    const refreshToken = hashParams.get('refresh_token') || queryParams.get('refresh_token')
+    const type = hashParams.get('type') || queryParams.get('type')
+
+    // If we have auth parameters, handle the magic link authentication
+    if (accessToken && refreshToken && type === 'magiclink') {
+      try {
+        // Set the session in Supabase
+        await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        })
+
+        // Clear the URL parameters to avoid issues with refreshing
+        if (window.history.replaceState) {
+          window.history.replaceState({}, document.title, window.location.pathname + '#/dashboard')
+        }
+
+        // Redirect to dashboard
+        next({ path: '/dashboard', replace: true })
+        return
+      } catch (error) {
+        console.error('Error setting session from magic link:', error)
+        next({ path: '/login' })
+        return
+      }
+    }
+
     // Import auth store dynamically to avoid circular dependency
     const authStoreModule = await import('src/stores/auth-store')
     const { useAuthStore } = authStoreModule
