@@ -73,7 +73,7 @@ export const useAuthStore = defineStore('auth', () => {
           // If `localhost` is verified, the email won't be sent, and the user will be automatically signed in.
           // This is intended for testing purposes.
           // The router will handle the magic link parameters and redirect to the dashboard
-          emailRedirectTo: 'https://www.day41.app',
+          emailRedirectTo: 'https://www.day41.app/#dashboard',
         },
       })
 
