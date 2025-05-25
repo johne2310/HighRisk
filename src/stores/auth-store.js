@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
         if (session !== null) {
           userDetails.id = session.user.id
           userDetails.email = session.user.email
-          console.log('User details: ', userDetails)
+          console.log('User details from authstatechange: ', event, userDetails)
           router.push('/dashboard')
         }
       } else if (event === 'SIGNED_OUT') {
@@ -46,33 +46,27 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   //sign in using magic link
-  async function signInWithMagicLink(email) {
-    try {
-      console.log('magic email: ', email)
-      const { data, error } = await supabase.auth.signInWithOtp({
-        email: email,
-        options: {
-          // Set to true if you want to redirect the user to an app screen rather than the "auth/v1/verify" page
-          shouldCreateUser: true,
-          // If `localhost` is verified, the email won't be sent, and the user will be automatically signed in.
-          // This is intended for testing purposes.
-          // The router will handle the magic link parameters and redirect to the dashboard
-          // emailRedirectTo: 'http://localhost:9000/#/dashboard',
-          emailRedirectTo: 'https://www.day41.app/#/dashboard',
-        },
-      })
+  const signInWithMagicLink = async (email) => {
+    console.log('magic email: ', email)
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email,
+      options: {
+        // Set to true if you want to redirect the user to an app screen rather than the "auth/v1/verify" page
+        shouldCreateUser: false,
+        // If `localhost` is verified, the email won't be sent, and the user will be automatically signed in.
+        // This is intended for testing purposes.
+        // The router will handle the magic link parameters and redirect to the dashboard
+        emailRedirectTo: 'http://localhost:9000/dashboard',
+        // emailRedirectTo: 'https://www.day41.app/#/dashboard',
+      },
+    })
 
-      if (error) {
-        console.error('Error sending magic link:', error.message)
-        return { success: false, error: error.message }
-      }
-
-      console.log('Magic link sent successfully! Refer email to sign in.')
-      return { success: true, data: data }
-    } catch (error) {
-      console.error('Unexpected error:', error.message)
-      return { success: false, error: error.message }
+    if (error) {
+      console.error('Error sending magic link:', error.message)
     }
+
+    console.log('Magic link sent successfully! Refer email to sign in.')
+    // return { success: true, data: data }
   }
 
   // Sign in with email and password

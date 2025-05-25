@@ -56,7 +56,7 @@ onMounted(async () => {
         position: 'top',
         timeout: 2000,
       })
-      router.push('/surveys')
+      await router.push('/surveys')
     }
   }
 })

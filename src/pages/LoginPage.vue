@@ -165,7 +165,9 @@ const gotoResetPassword = () => {
 
 // Handle login
 const handleLogin = () => {
-  authStore.loginUser(credentials)
+  // authStore.loginUser(credentials)
+
+  authStore.signInWithMagicLink(credentials.email)
 
   // if (success) {
   //   // Successful login

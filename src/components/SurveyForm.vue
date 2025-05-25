@@ -90,7 +90,7 @@ const defaultForm = {
   ward: '',
   hospital: '',
   isHighRisk: null,
-  user_Id: authStore.user.id,
+  user_id: authStore.userDetails.id,
 }
 
 // Form data
@@ -124,7 +124,7 @@ watch(
         ward: formData.ward || '',
         hospital: formData.hospital || '',
         isHighRisk: formData.isHighRisk !== undefined ? formData.isHighRisk : null,
-        user_Id: formData.user.id || authStore.user.id,
+        user_id: formData.user.id || authStore.userDetails.id,
         // Include any other fields that might be in the original data
         ...formData,
       }
@@ -135,7 +135,7 @@ watch(
 
 // Load settings from settings store if available
 onMounted(() => {
-  console.log('uuser: ', authStore.user)
+  console.log('user: ', authStore.userDetails)
   // Only load defaults if we're not in edit mode
   if (!props.initialData) {
     // Load collector name from settings store if available
@@ -203,7 +203,7 @@ const resetForm = () => {
       ward: formData.ward || '',
       hospital: formData.hospital || '',
       isHighRisk: formData.isHighRisk !== undefined ? formData.isHighRisk : null,
-      user_Id: authStore.user.id,
+      user_id: authStore.userDetails.id,
 
       // Include any other fields that might be in the original data
       ...formData,

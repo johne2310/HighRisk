@@ -42,7 +42,7 @@ export default defineConfig((/* ctx */) => {
         APP_VERSION: JSON.stringify(require('./package.json').version),
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,

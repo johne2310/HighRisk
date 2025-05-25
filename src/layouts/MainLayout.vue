@@ -51,37 +51,37 @@ const linksList = [
     title: 'Dashboard',
     caption: 'Overview of audit data',
     icon: 'dashboard',
-    link: '#/dashboard',
+    link: '/dashboard',
   },
   {
     title: 'New Survey',
     caption: 'Create a new patient audit',
     icon: 'add_circle',
-    link: '#/survey',
+    link: '/survey',
   },
   {
     title: 'View Surveys',
     caption: 'Review collected data',
     icon: 'list',
-    link: '#/surveys',
+    link: '/surveys',
   },
   {
     title: 'High Risk Patients',
     caption: 'Patients on 5+ medications',
     icon: 'warning',
-    link: '#/high-risk',
+    link: '/high-risk',
   },
   {
     title: 'Settings',
     caption: 'Application settings',
     icon: 'settings',
-    link: '#/settings',
+    link: '/settings',
   },
   {
     title: 'Help',
     caption: 'User guide and support',
     icon: 'help',
-    link: '#/help',
+    link: '/help',
   },
 ]
 
