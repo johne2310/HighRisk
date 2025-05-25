@@ -114,7 +114,7 @@ export const useSurveyStore = defineStore('survey', () => {
       audits.value = data || []
 
       // Set up real-time subscription after initial data fetch
-      subscribeToRealtimeUpdates()
+      // subscribeToRealtimeUpdates()
     } catch (err) {
       console.error('Error fetching audits:', err)
       error.value = err.message || 'Failed to fetch audits'

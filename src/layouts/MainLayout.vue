@@ -8,7 +8,7 @@
 
         <div class="q-mr-md">ver: {{ packageInfo.version }}</div>
 
-        <div v-if="authStore.user" class="q-mr-sm">{{ authStore.user.email }}</div>
+        <div v-if="authStore.userDetails" class="q-mr-sm">{{ authStore.userDetails.email }}</div>
 
         <q-btn flat dense icon="logout" aria-label="Logout" @click="handleLogout">
           <q-tooltip>Logout</q-tooltip>
@@ -91,23 +91,20 @@ function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value
 }
 
-async function handleLogout() {
-  try {
-    const { success, error } = await authStore.signOut()
+const handleLogout = () => {
+  const { success, error } = authStore.logoutUser()
 
-    if (success) {
-      $q.notify({
-        color: 'positive',
-        message: 'You have been logged out',
-        icon: 'check_circle',
-      })
+  if (success) {
+    $q.notify({
+      color: 'positive',
+      message: 'You have been logged out',
+      icon: 'check_circle',
+    })
 
-      // Redirect to login page
-      await router.push('/login')
-    } else {
-      throw new Error(error || 'Logout failed')
-    }
-  } catch (error) {
+    // Redirect to login page
+    router.push('/login')
+  }
+  if (error) {
     $q.notify({
       color: 'negative',
       message: error.message || 'Logout failed',
@@ -115,6 +112,9 @@ async function handleLogout() {
     })
   }
 }
+onMounted(() => {
+  console.log('User email: ', authStore.userDetails)
+})
 </script>
 <style>
 .item-header {

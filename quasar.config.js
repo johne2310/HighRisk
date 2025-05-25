@@ -5,8 +5,6 @@ import { defineConfig } from '#q-app/wrappers'
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-
-
 export default defineConfig((/* ctx */) => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
@@ -41,8 +39,8 @@ export default defineConfig((/* ctx */) => {
         node: 'node20',
       },
       env: {
-    APP_VERSION: JSON.stringify(require('./package.json').version)
-  },
+        APP_VERSION: JSON.stringify(require('./package.json').version),
+      },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,
@@ -85,14 +83,14 @@ export default defineConfig((/* ctx */) => {
         clientPort: 9000,
         protocol: 'ws',
         reconnect: true,
-        timeout: 30000
-      }
+        timeout: 3000,
+      },
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
       config: {
-        notify: {position: 'top-right', timeout: 2500} // Configure Notify Quasar plugin options here
+        notify: { position: 'top', timeout: 5000 }, // Configure Notify Quasar plugin options here
         // Example: https://v2.quasar.dev/quasar-plugins/notify#setting-defaults
         // notify: { position: 'top-right', timeout: 2500 }
       },
@@ -109,7 +107,6 @@ export default defineConfig((/* ctx */) => {
 
       // Quasar plugins
       plugins: ['Notify', 'Dialog'],
-
     },
 
     // animations: 'all', // --- includes all animations

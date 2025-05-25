@@ -1,62 +1,46 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, reactive } from 'vue'
 import supabase from './supabase'
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
+
   const user = ref(null)
   const loading = ref(false)
   const error = ref(null)
 
+  const userDetailsDefault = {
+    id: null,
+    email: null,
+  }
+  const userDetails = reactive({
+    ...userDetailsDefault,
+  })
+  const $q = useQuasar()
+
   // Getters
-  const isAuthenticated = computed(() => !!user.value)
 
   // Actions
   // Initialize the store by checking for an existing session
   const initialize = async () => {
-    loading.value = true
-    error.value = null
-
-    try {
-      // Get the current session
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession()
-
-      if (sessionError) throw sessionError
-
-      if (session) {
-        user.value = session.user
-      } else {
-        user.value = null
-      }
-    } catch (err) {
-      console.error('Error initializing auth store:', err)
-      error.value = err.message
-      user.value = null
-    } finally {
-      loading.value = false
-    }
-
-    // Set up auth state change listener
+    // loading.value = true
+    // error.value = null
+    console.log('Running initialize function')
+    const router = useRouter()
     supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
-        console.log('Signed in')
-      }
-      if (event === 'SIGNED_OUT') {
-        console.log('Signed out')
-      }
-      if (event === 'PASSWORD_RECOVERY') {
-        console.log('Password recovery')
-      }
-      if (event === 'EMAIL_VERIFICATION') {
-        console.log('Email verification')
-      }
-      if (session) {
-        user.value = session.user
-      } else {
-        user.value = null
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        if (session !== null) {
+          userDetails.id = session.user.id
+          userDetails.email = session.user.email
+          console.log('User details: ', userDetails)
+          router.push('/dashboard')
+        }
+      } else if (event === 'SIGNED_OUT') {
+        Object.assign(userDetails, userDetailsDefault)
+        console.log('User is signed out')
+        router.replace('/login')
       }
     })
   }
@@ -69,11 +53,12 @@ export const useAuthStore = defineStore('auth', () => {
         email: email,
         options: {
           // Set to true if you want to redirect the user to an app screen rather than the "auth/v1/verify" page
-          shouldCreateUser: false,
+          shouldCreateUser: true,
           // If `localhost` is verified, the email won't be sent, and the user will be automatically signed in.
           // This is intended for testing purposes.
           // The router will handle the magic link parameters and redirect to the dashboard
-          emailRedirectTo: 'https://www.day41.app/#dashboard',
+          // emailRedirectTo: 'http://localhost:9000/#/dashboard',
+          emailRedirectTo: 'https://www.day41.app/#/dashboard',
         },
       })
 
@@ -91,77 +76,62 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // Sign in with email and password
-  const signIn = async (email, password) => {
-    loading.value = true
-    error.value = null
+  const loginUser = async ({ email, password }) => {
+    console.log('Login details: ', email, password)
+    let { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-    try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+    if (error) {
+      console.error('Error signing in:', error.message)
+      $q.notify({
+        color: 'negative',
+        message: error.message,
+        icon: 'error',
       })
+    }
+    if (data.session !== null) {
+      console.log('data: ', data)
 
-      if (signInError) throw signInError
-
-      user.value = data.user
-      console.log('User is: ', user)
-      return { success: true }
-    } catch (err) {
-      console.error('Error signing in:', err)
-      error.value = err.message
-      return { success: false, error: err.message }
-    } finally {
-      loading.value = false
+      // Successful login
+      $q.notify({
+        color: 'positive',
+        message: 'Login successful',
+        icon: 'check_circle',
+      })
     }
   }
 
   // Sign up with email and password
-  const signUp = async (email, password) => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: 'https://www.day41.app/#/login',
-        },
-      })
-
-      if (signUpError) throw signUpError
-
-      return { success: true, data }
-    } catch (err) {
-      console.error('Error signing up:', err)
-      error.value = err.message
-      return { success: false, error: err.message }
-    } finally {
-      loading.value = false
+  const registerUser = async (email, password) => {
+    console.log('Register user with credentials: ', email, password)
+    let { data, error } = await supabase.auth.signUp({
+      email: 'audit2@test.com',
+      password: '123456',
+    })
+    if (error) {
+      console.error('Error signing up:', error.message)
+    }
+    if (data) {
+      console.log('User data: ', data)
     }
   }
 
   // Sign out
-  const signOut = async () => {
-    loading.value = true
-    error.value = null
+  const logoutUser = async () => {
+    const { error } = await supabase.auth.signOut()
 
-    try {
-      const { error: signOutError } = await supabase.auth.signOut()
-
-      if (signOutError) throw signOutError
-
-      user.value = null
-      return { success: true }
-    } catch (err) {
-      console.error('Error signing out:', err)
-      error.value = err.message
-      return { success: false, error: err.message }
-    } finally {
-      loading.value = false
+    if (error) {
+      console.error('Error signing out:', error.message)
+    } else {
+      $q.notify({
+        color: 'positive',
+        message: 'Logout successful',
+        icon: 'check_circle',
+      })
     }
   }
-
   // Reset password
   const resetPassword = async (email) => {
     loading.value = true
@@ -188,15 +158,17 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     loading,
     error,
+    userDetails,
 
     // Getters
-    isAuthenticated,
+    // isAuthenticated,
 
     // Actions
     initialize,
-    signIn,
-    signUp,
-    signOut,
+    // signIn,
+    registerUser,
+    logoutUser,
+    loginUser,
     resetPassword,
     signInWithMagicLink,
   }

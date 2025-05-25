@@ -9,15 +9,15 @@
       <q-card-section>
         <q-form @submit="handleLogin" class="q-gutter-md">
           <q-input
-            v-model="email"
+            v-model="credentials.email"
             label="Email"
             type="email"
             outlined
             :rules="[(val) => !!val || 'Email is required', isValidEmail]"
           />
 
-          <!--          <q-input
-            v-model="password"
+          <q-input
+            v-model="credentials.password"
             label="Password"
             :type="isPwd ? 'password' : 'text'"
             outlined
@@ -28,9 +28,9 @@
                 :name="isPwd ? 'visibility_off' : 'visibility'"
                 class="cursor-pointer"
                 @click="isPwd = !isPwd"
-               />
+              />
             </template>
-          </q-input>-->
+          </q-input>
 
           <div class="q-mt-md">
             <q-btn
@@ -126,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useAuthStore } from 'src/stores/auth-store'
@@ -136,9 +136,9 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 // Login form
-const email = ref('')
+// const email = ref('')
 // const password = ref('')
-// const isPwd = ref(true)
+const isPwd = ref(true)
 const loading = computed(() => authStore.loading)
 
 // Sign up form
@@ -153,44 +153,54 @@ const isValidEmail = (val) => {
   return emailPattern.test(val) || 'Invalid email format'
 }
 
+const credentials = reactive({
+  email: '',
+  password: '',
+})
+
 //go to password reset page
 const gotoResetPassword = () => {
   router.push('/reset-password')
 }
 
 // Handle login
-const handleLogin = async () => {
-  const { success, error } = await authStore.signInWithMagicLink(email.value)
+const handleLogin = () => {
+  authStore.loginUser(credentials)
 
-  if (success) {
-    // Successful login
-    $q.notify({
-      color: 'positive',
-      message: 'Login successful',
-      icon: 'check_circle',
-    })
-
-    // Redirect to home page
-    await router.push('/dashboard')
-  } else {
-    // Login failed
-    $q.notify({
-      color: 'negative',
-      message: error || 'Login failed',
-      icon: 'error',
-    })
-  }
+  // if (success) {
+  //   // Successful login
+  //   $q.notify({
+  //     color: 'positive',
+  //     message: 'Login successful',
+  //     icon: 'check_circle',
+  //   })
+  //
+  //   // Redirect to home page
+  //   router.push('/dashboard')
+  // } else {
+  //   // Login failed
+  //   $q.notify({
+  //     color: 'negative',
+  //     message: error || 'Login failed',
+  //     icon: 'error',
+  //   })
+  // }
 }
 
 // Handle sign up
-const handleSignUp = async () => {
-  const { success, error } = await authStore.signUp(signUpEmail.value, signUpPassword.value)
+const handleSignUp = () => {
+  console.log('credentials: ', signUpEmail.value, signUpPassword.value)
+  const { success, error } = authStore.registerUser({
+    email: signUpEmail.value,
+    password: signUpPassword.value,
+  })
 
   if (success) {
     $q.notify({
       color: 'positive',
       message: 'Sign up successful! Please check your email for verification.',
       icon: 'check_circle',
+      closeBtn: 'OK',
     })
 
     showSignUp.value = false
@@ -199,6 +209,17 @@ const handleSignUp = async () => {
       color: 'negative',
       message: error || 'Sign up failed',
       icon: 'error',
+      position: 'bottom',
+      timeout: 1000,
+      actions: [
+        {
+          label: 'Dismiss',
+          color: 'white',
+          handler: () => {
+            /* ... */
+          },
+        },
+      ],
     })
   }
 }
