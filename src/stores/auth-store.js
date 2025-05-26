@@ -52,7 +52,7 @@ export const useAuthStore = defineStore('auth', () => {
       email: email,
       options: {
         // Set to true if you want to redirect the user to an app screen rather than the "auth/v1/verify" page
-        shouldCreateUser: false,
+        shouldCreateUser: true,
         // If `localhost` is verified, the email won't be sent, and the user will be automatically signed in.
         // This is intended for testing purposes.
         // The router will handle the magic link parameters and redirect to the dashboard
@@ -64,7 +64,12 @@ export const useAuthStore = defineStore('auth', () => {
     if (error) {
       console.error('Error sending magic link:', error.message)
     }
-
+    // Successful login
+    $q.notify({
+      color: 'positive',
+      message: 'Magic link sent successfully! Refer email to sign in.',
+      icon: 'check_circle',
+    })
     console.log('Magic link sent successfully! Refer email to sign in.')
     // return { success: true, data: data }
   }

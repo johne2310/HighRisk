@@ -42,10 +42,6 @@ const router = useRouter()
 const $q = useQuasar()
 const authStore = useAuthStore()
 
-onMounted(async () => {
-  await authStore.initialize()
-})
-
 const linksList = [
   {
     title: 'Dashboard',
@@ -114,6 +110,9 @@ const handleLogout = () => {
 }
 onMounted(() => {
   console.log('User email: ', authStore.userDetails)
+  // if (authStore.userDetails.id == null) {
+  //   router.push('/login')
+  // }
 })
 </script>
 <style>

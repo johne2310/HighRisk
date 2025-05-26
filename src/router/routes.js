@@ -2,9 +2,9 @@
 
 const routes = [
   {
-    path: '/login',
+    path: '/',
     component: () => import('layouts/AuthLayout.vue'),
-    children: [{ path: '', component: () => import('pages/LoginPage.vue') }],
+    children: [{ path: 'login', component: () => import('pages/LoginPage.vue') }],
   },
   {
     path: '/',
@@ -38,6 +38,7 @@ const routes = [
       {
         path: 'help',
         component: () => import('pages/HelpPage.vue'),
+        meta: { requiresAuth: true },
       },
     ],
   },
@@ -57,6 +58,25 @@ const routes = [
       },
     ],
   },
+
+  {
+    path: '',
+    redirect: '/login', // Default redirect
+    beforeEnter: async (to, from, next) => {
+      console.log('Route guard execution empty path', to.path, from.path)
+      const authStoreModule = await import('src/stores/auth-store')
+      const { useAuthStore } = authStoreModule
+      const authStore = useAuthStore()
+
+      if (authStore.isAuthenticated && !authStore.loading) {
+        console.log('authenticated: ')
+        next('/dashboard')
+      } else {
+        next()
+      }
+    },
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {
