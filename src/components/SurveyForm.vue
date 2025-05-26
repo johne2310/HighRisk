@@ -124,8 +124,9 @@ watch(
         ward: formData.ward || '',
         hospital: formData.hospital || '',
         isHighRisk: formData.isHighRisk !== undefined ? formData.isHighRisk : null,
-        user_id: formData.user.id || authStore.userDetails.id,
+        user_id: formData.user_id || authStore.userDetails.id,
         // Include any other fields that might be in the original data
+
         ...formData,
       }
     }
