@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import supabase from './supabase'
 import {
   saveAudit,
   getAudits,
@@ -23,6 +24,18 @@ export const useSurveyStore = defineStore('survey', () => {
   const loading = ref(false)
   const error = ref(null)
   let subscription = null
+
+  // Assuming 'supabase' is your initialized Supabase client
+
+  const getTodayAuditCount = async () => {
+    const { data, err } = await supabase.rpc('get_today_audit_count')
+
+    if (err) {
+      console.error('Error fetching today audit count:', err)
+    } else {
+      console.log('Audits today:', data)
+    }
+  }
 
   // Getters
   const getAuditById = computed(() => {
@@ -247,5 +260,6 @@ export const useSurveyStore = defineStore('survey', () => {
     removeAudit,
     subscribeToRealtimeUpdates,
     unsubscribeFromRealtimeUpdates,
+    getTodayAuditCount,
   }
 })
