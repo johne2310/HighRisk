@@ -1,5 +1,6 @@
 <template>
-  <q-page padding class="flex flex-center">
+  <q-page padding
+          class="flex flex-center">
     <q-card class="auth-card">
       <q-card-section class="text-center">
         <div class="text-h4 text-primary q-mb-md">High Risk Patient Medication Audit</div>
@@ -7,63 +8,52 @@
       </q-card-section>
 
       <q-card-section>
-        <q-form @submit="handleLogin" class="q-gutter-md">
-          <q-input
-            v-model="credentials.email"
-            label="Email"
-            type="email"
-            outlined
-            :rules="[(val) => !!val || 'Email is required', isValidEmail]"
-          />
+        <q-form @submit="handleLogin"
+                class="q-gutter-md">
+          <q-input v-model="credentials.email"
+                   label="Email"
+                   type="email"
+                   outlined
+                   :rules="[(val) => !!val || 'Email is required', isValidEmail]" />
 
-          <q-input
-            v-model="credentials.password"
-            label="Password"
-            :type="isPwd ? 'password' : 'text'"
-            outlined
-            :rules="[(val) => !!val || 'Password is required']"
-          >
+          <q-input v-model="credentials.password"
+                   label="Password"
+                   :type="isPwd ? 'password' : 'text'"
+                   outlined
+                   :rules="[(val) => !!val || 'Password is required']">
             <template v-slot:append>
-              <q-icon
-                :name="isPwd ? 'visibility_off' : 'visibility'"
-                class="cursor-pointer"
-                @click="isPwd = !isPwd"
-              />
+              <q-icon :name="isPwd ? 'visibility_off' : 'visibility'"
+                      class="cursor-pointer"
+                      @click="isPwd = !isPwd" />
             </template>
           </q-input>
 
           <div class="q-mt-md">
-            <q-btn
-              label="Sign In"
-              type="submit"
-              color="primary"
-              class="full-width"
-              :loading="loading"
-            />
+            <q-btn label="Sign In"
+                   type="submit"
+                   color="primary"
+                   class="full-width"
+                   :loading="loading" />
           </div>
 
           <div class="text-center q-mt-sm">
-            <q-btn
-              flat
-              color="primary"
-              label="Forgot Password?"
-              @click="gotoResetPassword"
-              :disable="loading"
-            />
+            <q-btn flat
+                   color="primary"
+                   label="Forgot Password?"
+                   @click="gotoResetPassword"
+                   :disable="loading" />
           </div>
 
           <q-separator class="q-my-md" />
 
           <div class="text-center">
             <p class="text-grey-8">Don't have an account?</p>
-            <q-btn
-              outline
-              color="secondary"
-              label="Sign Up"
-              class="full-width"
-              @click="showSignUp = true"
-              :disable="loading"
-            />
+            <q-btn outline
+                   color="secondary"
+                   label="Sign Up"
+                   class="full-width"
+                   @click="showSignUp = true"
+                   :disable="loading" />
           </div>
         </q-form>
       </q-card-section>
@@ -77,48 +67,45 @@
         </q-card-section>
 
         <q-card-section>
-          <q-form @submit="handleSignUp" class="q-gutter-md">
-            <q-input
-              v-model="signUpEmail"
-              label="Email"
-              type="email"
-              outlined
-              :rules="[(val) => !!val || 'Email is required', isValidEmail]"
-            />
+          <q-form @submit="handleSignUp"
+                  class="q-gutter-md">
+            <q-input v-model="signUpEmail"
+                     label="Email"
+                     type="email"
+                     outlined
+                     :rules="[(val) => !!val || 'Email is required', isValidEmail]" />
 
-            <q-input
-              v-model="signUpPassword"
-              label="Password"
-              :type="isSignUpPwd ? 'password' : 'text'"
-              outlined
-              :rules="[
+            <q-input v-model="signUpPassword"
+                     label="Password"
+                     :type="isSignUpPwd ? 'password' : 'text'"
+                     outlined
+                     :rules="[
                 (val) => !!val || 'Password is required',
                 (val) => val.length >= 6 || 'Password must be at least 6 characters',
-              ]"
-            >
+              ]">
               <template v-slot:append>
-                <q-icon
-                  :name="isSignUpPwd ? 'visibility_off' : 'visibility'"
-                  class="cursor-pointer"
-                  @click="isSignUpPwd = !isSignUpPwd"
-                />
+                <q-icon :name="isSignUpPwd ? 'visibility_off' : 'visibility'"
+                        class="cursor-pointer"
+                        @click="isSignUpPwd = !isSignUpPwd" />
               </template>
             </q-input>
 
             <div class="q-mt-md">
-              <q-btn
-                label="Sign Up"
-                type="submit"
-                color="secondary"
-                class="full-width"
-                :loading="loading"
-              />
+              <q-btn label="Sign Up"
+                     type="submit"
+                     color="secondary"
+                     class="full-width"
+                     :loading="loading" />
             </div>
           </q-form>
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" v-close-popup :disable="loading" />
+          <q-btn flat
+                 label="Cancel"
+                 color="primary"
+                 v-close-popup
+                 :disable="loading" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -129,7 +116,7 @@
 import { ref, computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import { useAuthStore } from 'src/stores/auth-store'
+import { useAuthStore } from 'stores/supabase/auth-store.js'
 
 const $q = useQuasar()
 const router = useRouter()
@@ -155,7 +142,7 @@ const isValidEmail = (val) => {
 
 const credentials = reactive({
   email: '',
-  password: '',
+  password: ''
 })
 
 //go to password reset page
@@ -194,7 +181,7 @@ const handleSignUp = () => {
   console.log('credentials: ', signUpEmail.value, signUpPassword.value)
   const { success, error } = authStore.registerUser({
     email: signUpEmail.value,
-    password: signUpPassword.value,
+    password: signUpPassword.value
   })
 
   if (success) {
@@ -202,7 +189,7 @@ const handleSignUp = () => {
       color: 'positive',
       message: 'Sign up successful! Please check your email for verification.',
       icon: 'check_circle',
-      closeBtn: 'OK',
+      closeBtn: 'OK'
     })
 
     showSignUp.value = false
@@ -219,9 +206,9 @@ const handleSignUp = () => {
           color: 'white',
           handler: () => {
             /* ... */
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
   }
 }

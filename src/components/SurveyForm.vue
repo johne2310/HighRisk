@@ -1,65 +1,64 @@
 <template>
-  <q-form @submit="onSubmit" class="q-gutter-md">
+  <q-form @submit="onSubmit"
+          class="q-gutter-md">
     <div class="text-h6 q-mb-md">Patient Medication Audit Form</div>
 
     <!-- Date of audit -->
-    <q-input
-      filled
-      v-model="form.auditDate"
-      label="Date of Audit *"
-      type="date"
-      :rules="[(val) => !!val || 'Date is required']"
-    />
+    <q-input filled
+             v-model="form.auditDate"
+             label="Date of Audit *"
+             type="date"
+             :rules="[(val) => !!val || 'Date is required']" />
 
     <!-- Name of person collecting data -->
-    <q-input
-      filled
-      v-model="form.collectorName"
-      label="Data Collector Name *"
-      :rules="[(val) => !!val || 'Name is required']"
-    />
+    <q-input filled
+             v-model="form.collectorName"
+             label="Data Collector Name *"
+             :rules="[(val) => !!val || 'Name is required']" />
 
     <!-- Patient ID -->
-    <q-input
-      filled
-      v-model="form.patientId"
-      label="Patient ID *"
-      :rules="[(val) => !!val || 'Patient ID is required']"
-    />
+    <q-input filled
+             v-model="form.patientId"
+             label="Patient ID *"
+             :rules="[(val) => !!val || 'Patient ID is required']" />
 
     <!-- Bed number -->
-    <q-input
-      filled
-      v-model="form.bedNumber"
-      label="Bed Number *"
-      :rules="[(val) => !!val || 'Bed number is required']"
-    />
+    <q-input filled
+             v-model="form.bedNumber"
+             label="Bed Number *"
+             :rules="[(val) => !!val || 'Bed number is required']" />
 
     <!-- Ward -->
-    <q-input
-      filled
-      v-model="form.ward"
-      label="Ward *"
-      :rules="[(val) => !!val || 'Ward is required']"
-    />
+    <q-input filled
+             v-model="form.ward"
+             label="Ward *"
+             :rules="[(val) => !!val || 'Ward is required']" />
 
     <!-- Hospital -->
-    <q-input
-      filled
-      v-model="form.hospital"
-      label="Hospital *"
-      :rules="[(val) => !!val || 'Hospital is required']"
-    />
+    <q-input filled
+             v-model="form.hospital"
+             label="Hospital *"
+             :rules="[(val) => !!val || 'Hospital is required']" />
 
     <!-- High-risk status (5+ medications) -->
     <div class="q-mb-md">
       <div class="text-subtitle1 q-mb-sm">Is the patient on 5 or more regular medications? *</div>
-      <q-option-group v-model="form.isHighRisk" :options="highRiskOptions" color="primary" inline />
+      <q-option-group v-model="form.isHighRisk"
+                      :options="highRiskOptions"
+                      color="primary"
+                      inline />
     </div>
 
     <div class="q-mt-lg">
-      <q-btn label="Submit" type="submit" color="primary" />
-      <q-btn label="Reset" type="reset" color="secondary" flat class="q-ml-sm" @click="resetForm" />
+      <q-btn label="Submit"
+             type="submit"
+             color="primary" />
+      <q-btn label="Reset"
+             type="reset"
+             color="secondary"
+             flat
+             class="q-ml-sm"
+             @click="resetForm" />
     </div>
   </q-form>
 </template>
@@ -67,14 +66,14 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useSettingsStore } from '../stores/settings-store'
-import { useAuthStore } from 'src/stores/auth-store'
+import { useAuthStore } from 'stores/supabase/auth-store.js'
 
 // Define props
 const props = defineProps({
   initialData: {
     type: Object,
-    default: null,
-  },
+    default: null
+  }
 })
 
 // Get settings store
@@ -90,7 +89,7 @@ const defaultForm = {
   ward: '',
   hospital: '',
   isHighRisk: null,
-  user_id: authStore.userDetails.id,
+  user_id: authStore.userDetails.id
 }
 
 // Form data
@@ -99,7 +98,7 @@ const form = ref({ ...defaultForm })
 // Options for high-risk radio buttons
 const highRiskOptions = [
   { label: 'Yes', value: true },
-  { label: 'No', value: false },
+  { label: 'No', value: false }
 ]
 
 // Watch for changes in initialData prop
@@ -127,11 +126,11 @@ watch(
         user_id: formData.user_id || authStore.userDetails.id,
         // Include any other fields that might be in the original data
 
-        ...formData,
+        ...formData
       }
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 
 // Load settings from settings store if available
@@ -207,7 +206,7 @@ const resetForm = () => {
       user_id: authStore.userDetails.id,
 
       // Include any other fields that might be in the original data
-      ...formData,
+      ...formData
     }
   } else {
     // If we're in create mode, reset to defaults but keep collector name and hospital
@@ -216,7 +215,7 @@ const resetForm = () => {
       auditDate: new Date().toISOString().substr(0, 10), // Always use current date
       collectorName: form.value.collectorName, // Keep the collector name
       hospital: form.value.hospital, // Keep the hospital
-      ward: form.value.ward,
+      ward: form.value.ward
     }
   }
 }

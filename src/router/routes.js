@@ -4,7 +4,7 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/AuthLayout.vue'),
-    children: [{ path: 'login', component: () => import('pages/LoginPage.vue') }],
+    children: [{ path: 'login', component: () => import('pages/LoginPage.vue') }]
   },
   {
     path: '/',
@@ -13,34 +13,34 @@ const routes = [
     children: [
       {
         path: 'dashboard',
-        component: () => import('pages/IndexPage.vue'),
+        component: () => import('pages/IndexPage.vue')
       },
       {
         path: 'survey',
-        component: () => import('pages/SurveyPage.vue'),
+        component: () => import('pages/SurveyPage.vue')
       },
       {
         path: 'surveys',
-        component: () => import('pages/SurveysListPage.vue'),
+        component: () => import('pages/SurveysListPage.vue')
       },
       {
         path: 'surveys/:id',
-        component: () => import('pages/SurveyPage.vue'),
+        component: () => import('pages/SurveyPage.vue')
       },
       {
         path: 'high-risk',
-        component: () => import('pages/HighRiskPage.vue'),
+        component: () => import('pages/HighRiskPage.vue')
       },
       {
         path: 'settings',
-        component: () => import('pages/SettingsPage.vue'),
+        component: () => import('pages/SettingsPage.vue')
       },
       {
         path: 'help',
         component: () => import('pages/HelpPage.vue'),
-        meta: { requiresAuth: true },
-      },
-    ],
+        meta: { requiresAuth: true }
+      }
+    ]
   },
   {
     path: '/',
@@ -49,22 +49,22 @@ const routes = [
       {
         path: 'reset-password',
         component: () => import('pages/ResetPasswordPage.vue'),
-        meta: { requiresAuth: false },
+        meta: { requiresAuth: false }
       },
       {
         path: 'change-password',
         component: () => import('pages/ChangePasswordPage.vue'),
-        meta: { requiresAuth: false },
-      },
-    ],
+        meta: { requiresAuth: false }
+      }
+    ]
   },
 
   {
     path: '',
     redirect: '/login', // Default redirect
-    beforeEnter: async (to, from, next) => {
+    beforeEnter: async(to, from, next) => {
       console.log('Route guard execution empty path', to.path, from.path)
-      const authStoreModule = await import('src/stores/auth-store')
+      const authStoreModule = await import('stores/supabase/auth-store.js')
       const { useAuthStore } = authStoreModule
       const authStore = useAuthStore()
 
@@ -74,15 +74,15 @@ const routes = [
       } else {
         next()
       }
-    },
+    }
   },
 
   // Always leave this as last one,
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue'),
-  },
+    component: () => import('pages/ErrorNotFound.vue')
+  }
 ]
 
 export default routes

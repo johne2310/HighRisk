@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
-import supabase from './supabase'
+import supabase from './index.js'
 import { useRouter } from 'vue-router'
+import { useSurveyStore } from 'stores/survey-store.js'
 import { useToaster } from 'src/composables/userToaster.js'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -15,20 +16,21 @@ export const useAuthStore = defineStore('auth', () => {
 
   const userDetailsDefault = {
     id: null,
-    email: null,
+    email: null
   }
   const userDetails = reactive({
-    ...userDetailsDefault,
+    ...userDetailsDefault
   })
 
   // Getters
 
   // Actions
   // Initialize the store by checking for an existing session
-  const initialize = async () => {
+  const initialize = async() => {
     // loading.value = true
     // error.value = null
     const router = useRouter()
+    const surveyStore = useSurveyStore()
     supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
         if (session !== null) {
@@ -36,6 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
           userDetails.email = session.user.email
           // console.log('User details from authstatechange: ', event, userDetails)
           router.push('/dashboard')
+          surveyStore.loadAudits() //load audits on login
         }
       } else if (event === 'SIGNED_OUT') {
         Object.assign(userDetails, userDetailsDefault)
@@ -46,7 +49,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   //sign in using magic link
-  const signInWithMagicLink = async (email) => {
+  const signInWithMagicLink = async(email) => {
     console.log('magic email: ', email)
     const { error } = await supabase.auth.signInWithOtp({
       email: email,
@@ -56,9 +59,9 @@ export const useAuthStore = defineStore('auth', () => {
         // If `localhost` is verified, the email won't be sent, and the user will be automatically signed in.
         // This is intended for testing purposes.
         // The router will handle the magic link parameters and redirect to the dashboard
-        emailRedirectTo: 'http://localhost:9000/dashboard',
+        emailRedirectTo: 'http://localhost:9000/dashboard'
         // emailRedirectTo: 'https://www.day41.app/dashboard',
-      },
+      }
     })
 
     if (error) {
@@ -71,11 +74,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // Sign in with email and password
-  const loginUser = async ({ email, password }) => {
+  const loginUser = async({ email, password }) => {
     console.log('Login details: ', email, password)
     let { data, error } = await supabase.auth.signInWithPassword({
       email,
-      password,
+      password
     })
 
     if (error) {
@@ -90,11 +93,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // Sign up with email and password
-  const registerUser = async (email, password) => {
+  const registerUser = async(email, password) => {
     console.log('Register user with credentials: ', email, password)
     let { data, error } = await supabase.auth.signUp({
       email: 'audit2@test.com',
-      password: '123456',
+      password: '123456'
     })
     if (error) {
       console.error('Error signing up:', error.message)
@@ -105,7 +108,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // Sign out
-  const logoutUser = async () => {
+  const logoutUser = async() => {
     const { error } = await supabase.auth.signOut()
 
     if (error) {
@@ -115,22 +118,24 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   // Reset password
-  const resetPassword = async (email) => {
+  const resetPassword = async(email) => {
     loading.value = true
     error.value = null
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.day41.app/#/change-password',
+        redirectTo: 'https://www.day41.app/#/change-password'
       })
 
       if (resetError) throw resetError
 
       return { success: true }
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error resetting password:', err)
       error.value = err.message
       return { success: false, error: err.message }
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
@@ -152,6 +157,6 @@ export const useAuthStore = defineStore('auth', () => {
     logoutUser,
     loginUser,
     resetPassword,
-    signInWithMagicLink,
+    signInWithMagicLink
   }
 })

@@ -1,14 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { useAuthStore } from 'stores/supabase/auth-store.js'
+import { useToaster } from 'src/composables/userToaster.js'
 import supabase from './supabase'
 import {
-  saveAudit,
-  getAudits,
+  // saveAudit, //todo - remove once new code in place
+  // getAudits, //todo - remove once new code in place
   getHighRiskAudits,
-  // getAuditStats,
+  // getAuditStats, //todo - remove once new code in place
   updateAudit,
   deleteAudit,
-  subscribeToAudits,
+  subscribeToAudits
 } from './supabase'
 
 export const useSurveyStore = defineStore('survey', () => {
@@ -19,20 +21,21 @@ export const useSurveyStore = defineStore('survey', () => {
     totalAudits: 0,
     highRiskCount: 0,
     todayCount: 0,
-    highRiskPercentage: 0,
+    highRiskPercentage: 0
   })
   const loading = ref(false)
   const error = ref(null)
   let subscription = null
+  const { showError, showInfo } = useToaster()
 
   // ******************
   // GET KEY STATISTICS
   // ******************
 
   /*********************************************
-    Run Supabase RPC to get today's audit count'
-  **********************************************/
-  const getTodayAuditCount = async () => {
+   Run Supabase RPC to get today's audit count'
+   **********************************************/
+  const getTodayAuditCount = async() => {
     const { data: todayAuditCount, error: todayCountError } =
       await supabase.rpc('get_today_audit_count')
 
@@ -47,9 +50,9 @@ export const useSurveyStore = defineStore('survey', () => {
   /*
     Get high risk audits from stats table
   */
-  const getHighRiskAuditsFromStats = async () => {
+  const getHighRiskAuditsFromStats = async() => {
     const { data: highRiskCount, error: highRiskError } = await supabase.rpc(
-      'get_highrisk_audit_count',
+      'get_highrisk_audit_count'
     )
     if (highRiskError) {
       console.error('Error fetching high risk audits:', highRiskError)
@@ -61,9 +64,9 @@ export const useSurveyStore = defineStore('survey', () => {
   /*
     get total audit count from patient_audits
   */
-  const getAuditCount = async () => {
+  const getAuditCount = async() => {
     const { data: auditCount, error: auditCountError } = await supabase.rpc(
-      'get_total_patient_audits_count',
+      'get_total_patient_audits_count'
     )
     if (auditCountError) {
       console.error('Error fetching audit count:', auditCountError)
@@ -166,28 +169,69 @@ export const useSurveyStore = defineStore('survey', () => {
   }
 
   // Actions
-  const fetchAudits = async () => {
-    loading.value = true
-    error.value = null
+  const loadAudits = async() => {
+    const authStore = useAuthStore()
 
-    try {
-      const { data, error: fetchError } = await getAudits()
+    let { data: patient_audits, error } = await supabase
+      .from('patient_audits')
+      .select('*')
+      .eq('user_id', authStore.userDetails.id)
+      .order('created_at', { ascending: false })
 
-      if (fetchError) throw fetchError
-
-      audits.value = data || []
-
-      // Set up real-time subscription after initial data fetch
-      // subscribeToRealtimeUpdates()
-    } catch (err) {
-      console.error('Error fetching audits:', err)
-      error.value = err.message || 'Failed to fetch audits'
-    } finally {
-      loading.value = false
+    if (error) {
+      showError(error.message)
+      console.error('Error fetching patient_audits:', error)
+    } else if (patient_audits) {
+      showInfo('Patient audits loaded successfully') //todo - delete for final version
+      audits.value = patient_audits
+      await subscribeAudits()
     }
   }
 
-  const fetchHighRiskAudits = async () => {
+  const subscribeAudits = async() => {
+
+    supabase.channel('patient_audit_channel')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'patient_audits' },
+        (payload) => {
+          console.log('Change received!', payload)
+          if (payload.event === 'INSERT') {
+            console.log('New patient audit added!')
+            audits.value = [payload.new, ...audits.value]
+          } else if (payload.event === 'UPDATE') {
+            console.log('Patient audit updated!')
+            const index = audits.value.findIndex((audit) => audit.id === payload.new.id)
+            if (index !== -1) {
+              audits.value[index] = payload.new
+            }
+          } else if (payload.event === 'DELETE') {
+            console.log('Patient audit deleted!')
+            audits.value = audits.value.filter((audit) => audit.id !== payload.old.id)
+          }
+        }
+      )
+      .subscribe()
+  }
+
+  const saveAudit = async(auditData) => {
+    const { data, error } = await supabase.from('patient_audits').insert([auditData])
+
+    if (error) {
+      showError(error.message)
+      console.error('Error saving audit:', error)
+    } else if (data) {
+      showInfo('Audit saved successfully')
+      audits.value = [data[0], ...audits.value]
+      await subscribeAudits()
+    }
+  }
+
+  const fetchAudits = async() => {
+
+  }
+
+  const fetchHighRiskAudits = async() => {
     loading.value = true
     error.value = null
     console.log('running fetch high audit data: ')
@@ -197,10 +241,12 @@ export const useSurveyStore = defineStore('survey', () => {
       console.log('high risk audit data: ', data)
       if (fetchError) throw fetchError
       highRiskAudits.value = data || []
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error fetching high risk audits:', err)
       error.value = err.message || 'Failed to fetch high risk audits'
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
@@ -208,7 +254,7 @@ export const useSurveyStore = defineStore('survey', () => {
   /*
     Load key statistics for the dashboard
   */
-  const fetchStats = async () => {
+  const fetchStats = async() => {
     loading.value = true
     error.value = null
 
@@ -217,15 +263,17 @@ export const useSurveyStore = defineStore('survey', () => {
       await getHighRiskAuditsFromStats()
       await getAuditCount()
       await highRiskPercentage()
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error fetching stats:', err)
       error.value = err.message || 'Failed to fetch stats'
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
 
-  const addAudit = async (auditData) => {
+  const addAudit = async(auditData) => {
     loading.value = true
     error.value = null
 
@@ -239,16 +287,18 @@ export const useSurveyStore = defineStore('survey', () => {
       await fetchStats()
 
       return { success: true, data }
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error adding audit:', err)
       error.value = err.message || 'Failed to add audit'
       return { success: false, error: error.value }
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
 
-  const editAudit = async (id, auditData) => {
+  const editAudit = async(id, auditData) => {
     loading.value = true
     error.value = null
 
@@ -262,16 +312,18 @@ export const useSurveyStore = defineStore('survey', () => {
       await fetchStats()
 
       return { success: true, data }
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error updating audit:', err)
       error.value = err.message || 'Failed to update audit'
       return { success: false, error: error.value }
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
 
-  const removeAudit = async (id) => {
+  const removeAudit = async(id) => {
     loading.value = true
     error.value = null
 
@@ -285,11 +337,13 @@ export const useSurveyStore = defineStore('survey', () => {
       await fetchStats()
 
       return { success: true }
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error deleting audit:', err)
       error.value = err.message || 'Failed to delete audit'
       return { success: false, error: error.value }
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
@@ -311,14 +365,17 @@ export const useSurveyStore = defineStore('survey', () => {
     fetchAudits,
     fetchHighRiskAudits,
     fetchStats,
-    addAudit,
+    loadAudits,
+    addAudit, //todo - remove once new code in place
+    saveAudit,
     editAudit,
     removeAudit,
+    subscribeAudits,
     subscribeToRealtimeUpdates,
     unsubscribeFromRealtimeUpdates,
     getTodayAuditCount,
     getHighRiskAuditsFromStats,
     getAuditCount,
-    highRiskPercentage,
+    highRiskPercentage
   }
 })

@@ -17,7 +17,8 @@
           </q-card-section>
 
           <q-card-section>
-            <survey-form @submit="handleSubmit" :initial-data="auditData" />
+            <survey-form @submit="handleSubmit"
+                         :initial-data="auditData" />
           </q-card-section>
         </q-card>
       </div>
@@ -43,7 +44,7 @@ const isEditing = computed(() => !!auditId.value)
 const auditData = ref(null)
 
 // Fetch audit data if in edit mode
-onMounted(async () => {
+onMounted(async() => {
   if (isEditing.value) {
     await surveyStore.fetchAudits()
     auditData.value = surveyStore.getAuditById(auditId.value)
@@ -54,7 +55,7 @@ onMounted(async () => {
         icon: 'error',
         message: 'Audit not found',
         position: 'top',
-        timeout: 2000,
+        timeout: 2000
       })
       await router.push('/surveys')
     }
@@ -62,7 +63,7 @@ onMounted(async () => {
 })
 
 // Handle form submission using the store
-const handleSubmit = async (formData) => {
+const handleSubmit = async(formData) => {
   console.log('Form submitted:', formData)
 
   // Show loading notification
@@ -80,7 +81,7 @@ const handleSubmit = async (formData) => {
   if (isEditing.value) {
     result = await surveyStore.editAudit(auditId.value, formData)
   } else {
-    result = await surveyStore.addAudit(formData)
+    result = await surveyStore.saveAudit(formData)
   }
 
   const { success, error } = result
@@ -103,7 +104,7 @@ const handleSubmit = async (formData) => {
         ? 'Survey data updated successfully'
         : 'Survey data saved successfully',
       position: 'top',
-      timeout: 2000,
+      timeout: 2000
     })
 
     // Redirect to surveys list
@@ -115,7 +116,7 @@ const handleSubmit = async (formData) => {
       icon: 'error',
       message: `Error ${isEditing.value ? 'updating' : 'saving'} data: ${error || 'Unknown error'}`,
       position: 'top',
-      timeout: 2000,
+      timeout: 2000
     })
   }
 }

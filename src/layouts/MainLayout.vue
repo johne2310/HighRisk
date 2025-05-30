@@ -2,25 +2,42 @@
   <q-layout view="hHh lpR fFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+        <q-btn flat
+               dense
+               round
+               icon="menu"
+               aria-label="Menu"
+               @click="toggleLeftDrawer" />
 
         <q-toolbar-title> High Risk Patient Audit</q-toolbar-title>
 
         <div class="q-mr-md">ver: {{ packageInfo.version }}</div>
 
-        <div v-if="authStore.userDetails" class="q-mr-sm">{{ authStore.userDetails.email }}</div>
+        <div v-if="authStore.userDetails"
+             class="q-mr-sm">{{ authStore.userDetails.email }}
+        </div>
 
-        <q-btn flat dense icon="logout" aria-label="Logout" @click="handleLogout">
+        <q-btn flat
+               dense
+               icon="logout"
+               aria-label="Logout"
+               @click="handleLogout">
           <q-tooltip>Logout</q-tooltip>
         </q-btn>
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+    <q-drawer v-model="leftDrawerOpen"
+              show-if-above
+              bordered>
       <q-list>
-        <q-item-label class="item-header" header> Menu </q-item-label>
+        <q-item-label class="item-header"
+                      header> Menu
+        </q-item-label>
 
-        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
+        <EssentialLink v-for="link in linksList"
+                       :key="link.title"
+                       v-bind="link" />
       </q-list>
     </q-drawer>
 
@@ -36,7 +53,7 @@ import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import EssentialLink from 'components/EssentialLink.vue'
 import packageInfo from '../../package.json'
-import { useAuthStore } from 'src/stores/auth-store'
+import { useAuthStore } from 'stores/supabase/auth-store.js'
 
 const router = useRouter()
 const $q = useQuasar()
@@ -47,43 +64,43 @@ const linksList = [
     title: 'Dashboard',
     caption: 'Overview of audit data',
     icon: 'dashboard',
-    link: '/dashboard',
+    link: '/dashboard'
   },
   {
     title: 'New Survey',
     caption: 'Create a new patient audit',
     icon: 'add_circle',
-    link: '/survey',
+    link: '/survey'
   },
   {
     title: 'View Surveys',
     caption: 'Review collected data',
     icon: 'list',
-    link: '/surveys',
+    link: '/surveys'
   },
   {
     title: 'High Risk Patients',
     caption: 'Patients on 5+ medications',
     icon: 'warning',
-    link: '/high-risk',
+    link: '/high-risk'
   },
   {
     title: 'Settings',
     caption: 'Application settings',
     icon: 'settings',
-    link: '/settings',
+    link: '/settings'
   },
   {
     title: 'Help',
     caption: 'User guide and support',
     icon: 'help',
-    link: '/help',
-  },
+    link: '/help'
+  }
 ]
 
 const leftDrawerOpen = ref(false)
 
-function toggleLeftDrawer() {
+function toggleLeftDrawer () {
   leftDrawerOpen.value = !leftDrawerOpen.value
 }
 
@@ -94,7 +111,7 @@ const handleLogout = () => {
     $q.notify({
       color: 'positive',
       message: 'You have been logged out',
-      icon: 'check_circle',
+      icon: 'check_circle'
     })
 
     // Redirect to login page
@@ -104,7 +121,7 @@ const handleLogout = () => {
     $q.notify({
       color: 'negative',
       message: error.message || 'Logout failed',
-      icon: 'error',
+      icon: 'error'
     })
   }
 }

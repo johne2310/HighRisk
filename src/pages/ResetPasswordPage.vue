@@ -6,32 +6,33 @@
       </q-card-section>
 
       <q-card-section>
-        <q-form @submit="handleSubmit" class="q-gutter-md">
-          <q-input
-            filled
-            type="email"
-            v-model="email"
-            label="Your email"
-            lazy-rules
-            :rules="[(val) => (val && val.length > 0) || 'Please enter your email']"
-          />
+        <q-form @submit="handleSubmit"
+                class="q-gutter-md">
+          <q-input filled
+                   type="email"
+                   v-model="email"
+                   label="Your email"
+                   lazy-rules
+                   :rules="[(val) => (val && val.length > 0) || 'Please enter your email']" />
 
           <div>
-            <q-btn
-              color="primary"
-              type="submit"
-              :label="loading ? 'Loading...' : 'Reset Password'"
-              :loading="loading"
-              :disable="loading"
-            />
-            &nbsp;&nbsp;
-            <q-btn type="button" label="Go to Login" @click="gotoLogin" color="info" />
+            <q-btn color="primary"
+                   type="submit"
+                   :label="loading ? 'Loading...' : 'Reset Password'"
+                   :loading="loading"
+                   :disable="loading" /> &nbsp;&nbsp;
+            <q-btn type="button"
+                   label="Go to Login"
+                   @click="gotoLogin"
+                   color="info" />
           </div>
 
-          <div v-if="error" class="text-red">
+          <div v-if="error"
+               class="text-red">
             {{ error }}
           </div>
-          <div v-if="successMessage" class="text-green">
+          <div v-if="successMessage"
+               class="text-green">
             {{ successMessage }}
           </div>
         </q-form>
@@ -41,7 +42,7 @@
 </template>
 
 <script setup>
-import { useAuthStore } from 'stores/auth-store.js'
+import { useAuthStore } from 'stores/supabase/auth-store.js'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -57,7 +58,7 @@ const error = ref(null)
 const successMessage = ref(null)
 const authStore = useAuthStore()
 
-const handleSubmit = async () => {
+const handleSubmit = async() => {
   loading.value = true
   error.value = null
   successMessage.value = null
@@ -69,9 +70,11 @@ const handleSubmit = async () => {
     } else {
       error.value = result.error
     }
-  } catch (err) {
+  }
+  catch (err) {
     error.value = err.message || 'An unexpected error occurred.'
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }

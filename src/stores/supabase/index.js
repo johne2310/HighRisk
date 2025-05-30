@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+// import { useAuthStore } from '../auth-store.js'
 
 // Supabase configuration
 // Replace these with your own Supabase project URL and anon key
@@ -7,6 +8,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseKey = import.meta.env.VITE_SUPABASE_LINK
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 
+// const authStore = useAuthStore()
 // TODO - move to survey store
 // Create Supabase client
 const supabase = createClient(supabaseUrl, supabaseKey)
@@ -21,11 +23,11 @@ export const subscribeToAudits = (callback) => {
       {
         event: '*',
         schema: 'public',
-        table: 'patient_audits',
+        table: 'patient_audits'
       },
       (payload) => {
         callback(payload)
-      },
+      }
     )
     .subscribe()
 }
@@ -35,7 +37,7 @@ export const subscribeToAudits = (callback) => {
  * @param {Object} auditData - The audit data to save
  * @returns {Promise} - The result of the insert operation
  */
-export const saveAudit = async (auditData) => {
+export const saveAudit = async(auditData) => {
   return supabase.from('patient_audits').insert([auditData])
 }
 
@@ -43,15 +45,19 @@ export const saveAudit = async (auditData) => {
  * Get all patient audits
  * @returns {Promise} - The result of the select operation
  */
-export const getAudits = async () => {
-  return supabase.from('patient_audits').select('*').order('auditDate', { ascending: false })
+export const getAudits = async() => {
+  return supabase
+    .from('patient_audits')
+    .select('*')
+    // .eq('user_id', authStore.userDetails.id)
+    .order('auditDate', { ascending: false })
 }
 
 /**
  * Get high-risk patient audits (patients on 5+ medications)
  * @returns {Promise} - The result of the select operation
  */
-export const getHighRiskAudits = async () => {
+export const getHighRiskAudits = async() => {
   return supabase
     .from('patient_audits')
     .select('*')
@@ -65,8 +71,12 @@ export const getHighRiskAudits = async () => {
  * @param {Object} auditData - The updated audit data
  * @returns {Promise} - The result of the update operation
  */
-export const updateAudit = async (id, auditData) => {
-  return await supabase.from('patient_audits').update(auditData).eq('id', id).select()
+export const updateAudit = async(id, auditData) => {
+  return await supabase
+    .from('patient_audits')
+    .update(auditData)
+    .eq('id', id)
+    .select()
 }
 
 /*
@@ -74,7 +84,7 @@ export const updateAudit = async (id, auditData) => {
  * @param {string} id - The ID of the audit to delete
  * @returns {Promise} - The result of the delete operation
  */
-export const deleteAudit = async (id) => {
+export const deleteAudit = async(id) => {
   return await supabase.from('patient_audits').delete().eq('id', id)
 }
 
