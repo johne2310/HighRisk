@@ -5,7 +5,7 @@ import {
   saveAudit,
   getAudits,
   getHighRiskAudits,
-  getAuditStats,
+  // getAuditStats,
   updateAudit,
   deleteAudit,
   subscribeToAudits,
@@ -25,19 +25,68 @@ export const useSurveyStore = defineStore('survey', () => {
   const error = ref(null)
   let subscription = null
 
-  // Assuming 'supabase' is your initialized Supabase client
+  // ******************
+  // GET KEY STATISTICS
+  // ******************
 
+  /*********************************************
+    Run Supabase RPC to get today's audit count'
+  **********************************************/
   const getTodayAuditCount = async () => {
-    const { data, err } = await supabase.rpc('get_today_audit_count')
+    const { data: todayAuditCount, error: todayCountError } =
+      await supabase.rpc('get_today_audit_count')
 
-    if (err) {
-      console.error('Error fetching today audit count:', err)
+    if (todayCountError) {
+      // showError(todayCountError || 'Error fetching today audit count')
+      console.error('Error fetching today audit count', todayCountError)
     } else {
-      console.log('Audits today:', data)
+      stats.value.todayCount = todayAuditCount
     }
   }
 
-  // Getters
+  /*
+    Get high risk audits from stats table
+  */
+  const getHighRiskAuditsFromStats = async () => {
+    const { data: highRiskCount, error: highRiskError } = await supabase.rpc(
+      'get_highrisk_audit_count',
+    )
+    if (highRiskError) {
+      console.error('Error fetching high risk audits:', highRiskError)
+    } else {
+      stats.value.highRiskCount = highRiskCount
+    }
+  }
+
+  /*
+    get total audit count from patient_audits
+  */
+  const getAuditCount = async () => {
+    const { data: auditCount, error: auditCountError } = await supabase.rpc(
+      'get_total_patient_audits_count',
+    )
+    if (auditCountError) {
+      console.error('Error fetching audit count:', auditCountError)
+    } else {
+      stats.value.totalAudits = auditCount
+    }
+  }
+
+  /*
+    Calculate high risk patient percentage
+  */
+  const highRiskPercentage = () => {
+    const highRiskPercentage =
+      stats.value.totalAudits === 0
+        ? 0
+        : (stats.value.highRiskCount / stats.value.totalAudits) * 100
+    stats.value.highRiskPercentage = Math.round(highRiskPercentage)
+    console.log('high riks %: ', stats.value.highRiskPercentage)
+  }
+
+  /*
+    Getters
+  */
   const getAuditById = computed(() => {
     return (id) => audits.value.find((audit) => audit.id === id)
   })
@@ -49,6 +98,8 @@ export const useSurveyStore = defineStore('survey', () => {
   const getAuditsByWard = computed(() => {
     return (ward) => audits.value.filter((audit) => audit.ward === ward)
   })
+
+  //todo - refactor get audts from supabase file to survey store
 
   // Real-time subscription
   const subscribeToRealtimeUpdates = () => {
@@ -139,12 +190,12 @@ export const useSurveyStore = defineStore('survey', () => {
   const fetchHighRiskAudits = async () => {
     loading.value = true
     error.value = null
-
+    console.log('running fetch high audit data: ')
     try {
       const { data, error: fetchError } = await getHighRiskAudits()
 
+      console.log('high risk audit data: ', data)
       if (fetchError) throw fetchError
-
       highRiskAudits.value = data || []
     } catch (err) {
       console.error('Error fetching high risk audits:', err)
@@ -154,13 +205,18 @@ export const useSurveyStore = defineStore('survey', () => {
     }
   }
 
+  /*
+    Load key statistics for the dashboard
+  */
   const fetchStats = async () => {
     loading.value = true
     error.value = null
 
     try {
-      const statsData = await getAuditStats()
-      stats.value = statsData
+      await getTodayAuditCount()
+      await getHighRiskAuditsFromStats()
+      await getAuditCount()
+      await highRiskPercentage()
     } catch (err) {
       console.error('Error fetching stats:', err)
       error.value = err.message || 'Failed to fetch stats'
@@ -241,10 +297,10 @@ export const useSurveyStore = defineStore('survey', () => {
   return {
     // State
     audits,
-    highRiskAudits,
     stats,
     loading,
     error,
+    highRiskAudits,
 
     // Getters
     getAuditById,
@@ -261,5 +317,8 @@ export const useSurveyStore = defineStore('survey', () => {
     subscribeToRealtimeUpdates,
     unsubscribeFromRealtimeUpdates,
     getTodayAuditCount,
+    getHighRiskAuditsFromStats,
+    getAuditCount,
+    highRiskPercentage,
   }
 })

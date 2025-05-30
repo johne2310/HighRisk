@@ -96,7 +96,6 @@ const surveyStore = useSurveyStore()
 // Fetch statistics when the component is mounted
 onMounted(async () => {
   await surveyStore.fetchStats()
-  await surveyStore.getTodayAuditCount()
 })
 
 // Clean up subscription when component is unmounted

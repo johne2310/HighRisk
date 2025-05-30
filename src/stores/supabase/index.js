@@ -4,21 +4,19 @@ import { createClient } from '@supabase/supabase-js'
 // Replace these with your own Supabase project URL and anon key
 // You can find these in your Supabase project settings > API
 
-console.log('Supabase URL: ', import.meta.env.VITE_SUPABASE_URL)
-console.log('Supabase KEY: ', import.meta.env.VITE_SUPABASE_LINK)
-
 const supabaseKey = import.meta.env.VITE_SUPABASE_LINK
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 
+// TODO - move to survey store
 // Create Supabase client
 const supabase = createClient(supabaseUrl, supabaseKey)
-console.log('Supabase client initialized')
 
 // Set up real-time subscription functions
 export const subscribeToAudits = (callback) => {
   return supabase
     .channel('patient_audits_changes')
     .on(
+      //
       'postgres_changes',
       {
         event: '*',
@@ -38,7 +36,7 @@ export const subscribeToAudits = (callback) => {
  * @returns {Promise} - The result of the insert operation
  */
 export const saveAudit = async (auditData) => {
-  return await supabase.from('patient_audits').insert([auditData])
+  return supabase.from('patient_audits').insert([auditData])
 }
 
 /**
@@ -46,7 +44,7 @@ export const saveAudit = async (auditData) => {
  * @returns {Promise} - The result of the select operation
  */
 export const getAudits = async () => {
-  return await supabase.from('patient_audits').select('*').order('auditDate', { ascending: false })
+  return supabase.from('patient_audits').select('*').order('auditDate', { ascending: false })
 }
 
 /**
@@ -54,52 +52,11 @@ export const getAudits = async () => {
  * @returns {Promise} - The result of the select operation
  */
 export const getHighRiskAudits = async () => {
-  return await supabase
+  return supabase
     .from('patient_audits')
     .select('*')
     .eq('isHighRisk', true)
     .order('auditDate', { ascending: false })
-}
-
-/**
- * Get audit statistics
- * @returns {Promise} - Object containing statistics
- */
-export const getAuditStats = async () => {
-  const { data: allAudits, error: allError } = await supabase.from('patient_audits').select('*')
-
-  const { data: highRiskAudits, error: highRiskError } = await supabase
-    .from('patient_audits')
-    .select('*')
-    .eq('isHighRisk', true)
-
-  const today = new Date().toISOString().substr(0, 10)
-  const { data: todayAudits, error: todayError } = await supabase
-    .from('patient_audits')
-    .select('*')
-    .eq('auditDate', today)
-
-  if (allError || highRiskError || todayError) {
-    console.error('Error fetching stats:', { allError, highRiskError, todayError })
-    return {
-      totalAudits: 0,
-      highRiskCount: 0,
-      todayCount: 0,
-      highRiskPercentage: 0,
-    }
-  }
-
-  const totalAudits = allAudits ? allAudits.length : 0
-  const highRiskCount = highRiskAudits ? highRiskAudits.length : 0
-  const todayCount = todayAudits ? todayAudits.length : 0
-  const highRiskPercentage = totalAudits > 0 ? (highRiskCount / totalAudits) * 100 : 0
-
-  return {
-    totalAudits,
-    highRiskCount,
-    todayCount,
-    highRiskPercentage: Math.round(highRiskPercentage),
-  }
 }
 
 /**
@@ -109,10 +66,10 @@ export const getAuditStats = async () => {
  * @returns {Promise} - The result of the update operation
  */
 export const updateAudit = async (id, auditData) => {
-  return await supabase.from('patient_audits').update(auditData).eq('id', id)
+  return await supabase.from('patient_audits').update(auditData).eq('id', id).select()
 }
 
-/**
+/*
  * Delete an audit
  * @param {string} id - The ID of the audit to delete
  * @returns {Promise} - The result of the delete operation

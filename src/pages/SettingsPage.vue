@@ -70,6 +70,7 @@ import { useQuasar } from 'quasar'
 import { useSettingsStore } from '../stores/settings-store'
 import { useHospitalStore } from '../stores/hospital-store'
 
+// ? - add a section to add/edit hospitals
 const $q = useQuasar()
 const settingsStore = useSettingsStore()
 const hospitalStore = useHospitalStore()
