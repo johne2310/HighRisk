@@ -53,7 +53,7 @@ import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import EssentialLink from 'components/EssentialLink.vue'
 import packageInfo from '../../package.json'
-import { useAuthStore } from 'stores/supabase/auth-store.js'
+import { useAuthStore } from 'stores/auth-store.js'
 
 const router = useRouter()
 const $q = useQuasar()

@@ -6,7 +6,9 @@
       <q-card-section>
         <div class="text-h6">
           Filters
-          <q-badge v-if="selectedHospital || selectedWard" color="primary" class="q-ml-sm">
+          <q-badge v-if="selectedHospital || selectedWard"
+                   color="primary"
+                   class="q-ml-sm">
             {{ (selectedHospital ? 1 : 0) + (selectedWard ? 1 : 0) }} active
           </q-badge>
         </div>
@@ -14,37 +16,31 @@
 
         <div class="row q-col-gutter-md">
           <div class="col-12 col-md-5">
-            <q-select
-              filled
-              v-model="selectedHospital"
-              :options="hospitals"
-              label="Filter by Hospital"
-              clearable
-              emit-value
-              map-options
-              @update:model-value="selectedWard = null"
-            />
+            <q-select filled
+                      v-model="selectedHospital"
+                      :options="hospitals"
+                      label="Filter by Hospital"
+                      clearable
+                      emit-value
+                      map-options
+                      @update:model-value="selectedWard = null" />
           </div>
           <div class="col-12 col-md-5">
-            <q-select
-              filled
-              v-model="selectedWard"
-              :options="wards"
-              label="Filter by Ward"
-              clearable
-              emit-value
-              map-options
-              :disable="!wards.length"
-            />
+            <q-select filled
+                      v-model="selectedWard"
+                      :options="wards"
+                      label="Filter by Ward"
+                      clearable
+                      emit-value
+                      map-options
+                      :disable="!wards.length" />
           </div>
-          <div class="col-12 col-md-2 flex items-center">
-            <q-btn
-              color="secondary"
-              label="Clear Filters"
-              @click="clearFilters"
-              :disable="!selectedHospital && !selectedWard"
-              class="q-mt-sm"
-            />
+          <div class="col-12 col-md-3 flex items-center">
+            <q-btn color="secondary"
+                   label="Clear Filters"
+                   @click="clearFilters"
+                   :disable="!selectedHospital && !selectedWard"
+                   class="q-mt-sm" />
           </div>
         </div>
       </q-card-section>
@@ -58,34 +54,33 @@
           <span v-if="filteredAudits.length !== surveyStore.audits.length">
             (Showing {{ filteredAudits.length }} of {{ surveyStore.audits.length }} records)
           </span>
-          <q-btn
-            color="primary"
-            icon="file_download"
-            label="Export to CSV"
-            class="float-right"
-            @click="exportToCSV"
-            :disable="!filteredAudits.length || surveyStore.loading"
-          />
+          <q-btn color="primary"
+                 icon="file_download"
+                 label="Export to CSV"
+                 class="float-right"
+                 @click="exportToCSV"
+                 :disable="!filteredAudits.length || surveyStore.loading" />
         </div>
         <br />
         <!-- Data table with audits from the store -->
-        <q-table
-          title="Patient Medication Audits"
-          :rows="filteredAudits"
-          :columns="columns"
-          row-key="id"
-          :loading="surveyStore.loading"
-          :rows-per-page-options="[10, 20, 30, 50]"
-        >
+        <q-table title="Patient Medication Audits"
+                 :rows="filteredAudits"
+                 :columns="columns"
+                 row-key="id"
+                 :loading="surveyStore.loading"
+                 :rows-per-page-options="[10, 20, 30, 50]">
           <template v-slot:loading>
             <q-inner-loading showing>
-              <q-spinner size="50px" color="primary" />
+              <q-spinner size="50px"
+                         color="primary" />
             </q-inner-loading>
           </template>
 
           <template v-slot:no-data>
             <div class="full-width row flex-center q-gutter-sm q-pa-lg">
-              <q-icon name="sentiment_dissatisfied" size="2rem" color="grey-7" />
+              <q-icon name="sentiment_dissatisfied"
+                      size="2rem"
+                      color="grey-7" />
               <span class="text-h6 text-grey-7">
                 {{
                   selectedHospital || selectedWard
@@ -93,35 +88,29 @@
                     : 'No audit data available yet'
                 }}
               </span>
-              <q-btn
-                v-if="selectedHospital || selectedWard"
-                color="primary"
-                label="Clear Filters"
-                @click="clearFilters"
-                class="q-mt-sm"
-              />
+              <q-btn v-if="selectedHospital || selectedWard"
+                     color="primary"
+                     label="Clear Filters"
+                     @click="clearFilters"
+                     class="q-mt-sm" />
             </div>
           </template>
 
           <!-- Actions column template -->
           <template v-slot:body-cell-actions="props">
             <q-td :props="props">
-              <q-btn
-                flat
-                round
-                dense
-                color="primary"
-                icon="edit"
-                @click="editAudit(props.row.id)"
-              />
-              <q-btn
-                flat
-                round
-                dense
-                color="negative"
-                icon="delete"
-                @click="confirmDelete(props.row)"
-              />
+              <q-btn flat
+                     round
+                     dense
+                     color="primary"
+                     icon="edit"
+                     @click="editAudit(props.row.id)" />
+              <q-btn flat
+                     round
+                     dense
+                     color="negative"
+                     icon="delete"
+                     @click="confirmDelete(props.row)" />
             </q-td>
           </template>
         </q-table>
@@ -133,12 +122,14 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { useSurveyStore } from 'src/stores/survey-store'
-import { useQuasar, exportFile } from 'quasar'
-import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { exportFile, useQuasar } from 'quasar'
+import { computed, onMounted, ref } from 'vue'
+import { useToaster } from 'src/composables/userToaster.js'
 
-const $q = useQuasar()
 const router = useRouter()
 const surveyStore = useSurveyStore()
+const { showSuccess, showError } = useToaster()
+const $q = useQuasar()
 
 // Filter variables
 const selectedHospital = ref(null)
@@ -192,13 +183,8 @@ const clearFilters = () => {
 }
 
 // Fetch audits and set up real-time subscription when the component is mounted
-onMounted(async () => {
-  await surveyStore.fetchAudits()
-})
-
-// Clean up subscription when component is unmounted
-onUnmounted(() => {
-  surveyStore.unsubscribeFromRealtimeUpdates()
+onMounted(async() => {
+  // await surveyStore.fetchAudits()
 })
 
 // Function to export audits to CSV
@@ -235,7 +221,7 @@ const exportToCSV = () => {
       wrapCsvValue(row.bedNumber),
       wrapCsvValue(row.ward),
       wrapCsvValue(row.hospital),
-      wrapCsvValue(row.isHighRisk ? 'Yes' : 'No'),
+      wrapCsvValue(row.isHighRisk ? 'Yes' : 'No')
     ]
     csvContent += rowData.join(',') + '\n'
   })
@@ -245,17 +231,9 @@ const exportToCSV = () => {
 
   // Use the Quasar Notify plugin to show success or error message
   if (status === true) {
-    $q.notify({
-      color: 'positive',
-      message: 'Audit data exported successfully',
-      icon: 'file_download',
-    })
+    showSuccess()
   } else {
-    $q.notify({
-      color: 'negative',
-      message: 'Export failed - browser denied file download',
-      icon: 'error',
-    })
+    showError('There was an error exporting the CSV file')
   }
 }
 
@@ -270,26 +248,14 @@ const confirmDelete = (audit) => {
     title: 'Confirm Deletion',
     message: `Are you sure you want to delete the audit for patient ${audit.patientId}?`,
     cancel: true,
-    persistent: true,
-  }).onOk(async () => {
-    const { success, error } = await surveyStore.removeAudit(audit.id)
+    persistent: true
+  }).onOk(async() => {
+    const { success, error } = await surveyStore.deleteAudit(audit.id)
 
     if (success) {
-      $q.notify({
-        color: 'positive',
-        icon: 'check_circle',
-        message: 'Audit deleted successfully',
-        position: 'top',
-        timeout: 2000,
-      })
+      showSuccess('Audit deleted successfully')
     } else {
-      $q.notify({
-        color: 'negative',
-        icon: 'error',
-        message: 'Error deleting audit: ' + (error || 'Unknown error'),
-        position: 'top',
-        timeout: 3000,
-      })
+      showError(error.message)
     }
   })
 }
@@ -303,7 +269,7 @@ const columns = [
     align: 'left',
     field: (row) => row.auditDate,
     format: (val) => `${val}`,
-    sortable: true,
+    sortable: true
   },
   {
     name: 'collectorName',
@@ -311,7 +277,7 @@ const columns = [
     label: 'Collector',
     align: 'left',
     field: 'collectorName',
-    sortable: true,
+    sortable: true
   },
   {
     name: 'patientId',
@@ -319,28 +285,28 @@ const columns = [
     label: 'Patient ID',
     align: 'left',
     field: 'patientId',
-    sortable: true,
+    sortable: true
   },
   {
     name: 'bedNumber',
     label: 'Bed',
     align: 'left',
     field: 'bedNumber',
-    sortable: true,
+    sortable: true
   },
   {
     name: 'ward',
     label: 'Ward',
     align: 'left',
     field: 'ward',
-    sortable: true,
+    sortable: true
   },
   {
     name: 'hospital',
     label: 'Hospital',
     align: 'left',
     field: 'hospital',
-    sortable: true,
+    sortable: true
   },
   {
     name: 'isHighRisk',
@@ -348,13 +314,13 @@ const columns = [
     align: 'center',
     field: 'isHighRisk',
     format: (val) => (val ? 'Yes' : 'No'),
-    sortable: true,
+    sortable: true
   },
   {
     name: 'actions',
     label: 'Actions',
     align: 'center',
-    field: 'actions',
-  },
+    field: 'actions'
+  }
 ]
 </script>

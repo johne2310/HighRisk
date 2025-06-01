@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { useAuthStore } from 'stores/supabase/auth-store.js'
+import { useAuthStore } from 'stores/auth-store.js'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 

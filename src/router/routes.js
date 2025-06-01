@@ -62,18 +62,18 @@ const routes = [
   {
     path: '',
     redirect: '/login', // Default redirect
-    beforeEnter: async(to, from, next) => {
+    beforeEnter: async(to, from) => {
       console.log('Route guard execution empty path', to.path, from.path)
-      const authStoreModule = await import('stores/supabase/auth-store.js')
-      const { useAuthStore } = authStoreModule
-      const authStore = useAuthStore()
+      // const authStoreModule = await import('stores/auth-store.js')
+      // const { useAuthStore } = authStoreModule
+      // const authStore = useAuthStore()
 
-      if (authStore.isAuthenticated && !authStore.loading) {
-        console.log('authenticated: ')
-        next('/dashboard')
-      } else {
-        next()
-      }
+      // if (authStore.isAuthenticated && !authStore.loading) {
+      //   console.log('authenticated: ')
+      //   next('/dashboard')
+      // } else {
+      //   next()
+      // }
     }
   },
 

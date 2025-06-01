@@ -1,5 +1,5 @@
 import { defineBoot } from '#q-app/wrappers'
-import { useAuthStore } from '/src/stores/supabase/auth-store'
+import { useAuthStore } from '/src/stores/auth-store'
 
 export default defineBoot(({ router }) => {
   router.beforeEach((to) => {

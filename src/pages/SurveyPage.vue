@@ -27,16 +27,17 @@
 </template>
 
 <script setup>
-import { useQuasar } from 'quasar'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useSurveyStore } from 'src/stores/survey-store'
 import SurveyForm from 'components/SurveyForm.vue'
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useToaster } from 'src/composables/userToaster.js'
 
-const $q = useQuasar()
+// const $q = useQuasar() //todo delete
 const router = useRouter()
 const route = useRoute()
 const surveyStore = useSurveyStore()
+const { showError, showSuccess } = useToaster()
 
 // Check if we're in edit mode
 const auditId = computed(() => route.params.id)
@@ -46,17 +47,11 @@ const auditData = ref(null)
 // Fetch audit data if in edit mode
 onMounted(async() => {
   if (isEditing.value) {
-    await surveyStore.fetchAudits()
+    await surveyStore.loadAudits()
     auditData.value = surveyStore.getAuditById(auditId.value)
 
     if (!auditData.value) {
-      $q.notify({
-        color: 'negative',
-        icon: 'error',
-        message: 'Audit not found',
-        position: 'top',
-        timeout: 2000
-      })
+      showError('Audit data not found.')
       await router.push('/surveys')
     }
   }
@@ -66,18 +61,8 @@ onMounted(async() => {
 const handleSubmit = async(formData) => {
   console.log('Form submitted:', formData)
 
-  // Show loading notification
-  // $q.notify({
-  //   group: 'loading',
-  //   spinner: true,
-  //   message: isEditing.value ? 'Updating audit data...' : 'Saving audit data...',
-  //   position: 'top',
-  //   timeout: 1000,
-  // })
-
   let result
 
-  // Save or update the audit data using the store
   if (isEditing.value) {
     result = await surveyStore.editAudit(auditId.value, formData)
   } else {
@@ -86,38 +71,13 @@ const handleSubmit = async(formData) => {
 
   const { success, error } = result
 
-  // Dismiss all notifications in the 'loading' group
-  // Using Quasar's Notify plugin API to dismiss notifications
-  // $q.notify({
-  //   group: 'loading',
-  //   timeout: 0,
-  //   message: '',
-  //   position: 'top',
-  // })
-
+// success or error are returned from the survey store functions
   if (success) {
-    // Show success notification
-    $q.notify({
-      color: 'positive',
-      icon: 'check_circle',
-      message: isEditing.value
-        ? 'Survey data updated successfully'
-        : 'Survey data saved successfully',
-      position: 'top',
-      timeout: 2000
-    })
-
+    showSuccess('Audit saved successfully')
     // Redirect to surveys list
     // router.push('/surveys')
   } else {
-    // Show error notification
-    $q.notify({
-      color: 'negative',
-      icon: 'error',
-      message: `Error ${isEditing.value ? 'updating' : 'saving'} data: ${error || 'Unknown error'}`,
-      position: 'top',
-      timeout: 2000
-    })
+    showError(error.message)
   }
 }
 </script>

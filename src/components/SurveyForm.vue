@@ -64,9 +64,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useSettingsStore } from '../stores/settings-store'
-import { useAuthStore } from 'stores/supabase/auth-store.js'
+import { useAuthStore } from 'stores/auth-store.js'
 
 // Define props
 const props = defineProps({
@@ -80,9 +80,18 @@ const props = defineProps({
 const settingsStore = useSettingsStore()
 const authStore = useAuthStore()
 
+// Function to get today's date in YYYY-MM-DD format (local time)
+const getTodayDateFormatted = () => {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0') // Month is 0-indexed
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 // Default form values
 const defaultForm = {
-  auditDate: new Date().toISOString().substr(0, 10), // Default to today
+  auditDate: getTodayDateFormatted(),
   collectorName: '',
   patientId: '',
   bedNumber: '',
@@ -116,7 +125,7 @@ watch(
 
       // Ensure all required fields are present
       form.value = {
-        auditDate: formData.auditDate || new Date().toISOString().substr(0, 10),
+        auditDate: formData.auditDate || getTodayDateFormatted(),
         collectorName: formData.collectorName || '',
         patientId: formData.patientId || '',
         bedNumber: formData.bedNumber || '',
@@ -128,6 +137,9 @@ watch(
 
         ...formData
       }
+    } else {
+      // If initialData is null, reset to default values
+      form.value = { ...defaultForm }
     }
   },
   { immediate: true }
@@ -196,7 +208,7 @@ const resetForm = () => {
 
     // Ensure all required fields are present
     form.value = {
-      auditDate: formData.auditDate || new Date().toISOString().substr(0, 10),
+      auditDate: formData.auditDate || getTodayDateFormatted(),
       // collectorName: formData.collectorName || '',
       patientId: formData.patientId || '',
       bedNumber: formData.bedNumber || '',
@@ -210,12 +222,16 @@ const resetForm = () => {
     }
   } else {
     // If we're in create mode, reset to defaults but keep collector name and hospital
+    const currentCollectorName = form.value?.collectorName || ''
+    const currentHospital = form.value?.hospital || ''
+    const currentWard = form.value?.ward || ''
+
     form.value = {
       ...defaultForm,
-      auditDate: new Date().toISOString().substr(0, 10), // Always use current date
-      collectorName: form.value.collectorName, // Keep the collector name
-      hospital: form.value.hospital, // Keep the hospital
-      ward: form.value.ward
+      auditDate: getTodayDateFormatted(), // Always use current date
+      collectorName: currentCollectorName, // Keep the collector name
+      hospital: currentHospital, // Keep the hospital
+      ward: currentWard // Keep the ward
     }
   }
 }

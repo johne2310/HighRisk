@@ -54,7 +54,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from 'stores/supabase/auth-store.js'
+import { useAuthStore } from 'stores/auth-store.js'
 import { useQuasar } from 'quasar'
 
 const newPassword = ref('')

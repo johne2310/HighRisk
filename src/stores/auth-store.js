@@ -1,15 +1,15 @@
 import { defineStore } from 'pinia'
-import { ref, reactive } from 'vue'
-import supabase from './index.js'
+import { computed, reactive, ref } from 'vue'
+import supabase from './supabase/index.js'
 import { useRouter } from 'vue-router'
 import { useSurveyStore } from 'stores/survey-store.js'
 import { useToaster } from 'src/composables/userToaster.js'
 
 export const useAuthStore = defineStore('auth', () => {
-  const { showSuccess, showError } = useToaster()
 
   // State
 
+  const { showSuccess, showError } = useToaster()
   const user = ref(null)
   const loading = ref(false)
   const error = ref(null)
@@ -23,6 +23,8 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   // Getters
+  // Getters
+  const isAuthenticated = computed(() => !!userDetails.id)
 
   // Actions
   // Initialize the store by checking for an existing session
@@ -31,7 +33,20 @@ export const useAuthStore = defineStore('auth', () => {
     // error.value = null
     const router = useRouter()
     const surveyStore = useSurveyStore()
+
+    // Check current session first
+    const { data } = await supabase.auth.getSession()
+    if (data.session) {
+      userDetails.id = data.session.user.id
+      userDetails.email = data.session.user.email
+      await router.push('/dashboard')
+      await surveyStore.loadAudits()
+    }
+
     supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth event:', event) // Add this line
+      console.log('Auth session:', session)
+
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
         if (session !== null) {
           userDetails.id = session.user.id
@@ -84,11 +99,13 @@ export const useAuthStore = defineStore('auth', () => {
     if (error) {
       console.error('Error signing in:', error.message)
       showError(error.message)
+      return { success: false, error: error.message }
     }
     if (data.session !== null) {
       console.log('data: ', data)
       // Successful login
-      showSuccess('Login successful')
+      // showSuccess('Login successful'
+      return { success: true }
     }
   }
 
@@ -96,8 +113,8 @@ export const useAuthStore = defineStore('auth', () => {
   const registerUser = async(email, password) => {
     console.log('Register user with credentials: ', email, password)
     let { data, error } = await supabase.auth.signUp({
-      email: 'audit2@test.com',
-      password: '123456'
+      email: email,
+      password: password
     })
     if (error) {
       console.error('Error signing up:', error.message)
@@ -148,7 +165,7 @@ export const useAuthStore = defineStore('auth', () => {
     userDetails,
 
     // Getters
-    // isAuthenticated,
+    isAuthenticated,
 
     // Actions
     initialize,

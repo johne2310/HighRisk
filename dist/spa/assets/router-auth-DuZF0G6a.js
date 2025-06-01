@@ -1,1 +1,0 @@
-import{d as o,u as a}from"./index-CSjNZ9aV.js";const s=o(({router:r})=>{r.beforeEach(e=>{const t=a();if(e.path!=="/login"&&!t.userDetails.id)return"/login";if(e.path==="/login"&&t.userDetails.id)return!1})});export{s as default};

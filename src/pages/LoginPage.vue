@@ -113,14 +113,16 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import { useAuthStore } from 'stores/supabase/auth-store.js'
+import { useAuthStore } from 'stores/auth-store.js'
+import { useToaster } from 'src/composables/userToaster.js'
 
 const $q = useQuasar()
 const router = useRouter()
 const authStore = useAuthStore()
+const { showSuccess, showError } = useToaster()
 
 // Login form
 // const email = ref('')
@@ -151,29 +153,22 @@ const gotoResetPassword = () => {
 }
 
 // Handle login
-const handleLogin = () => {
-  // authStore.loginUser(credentials)
+const handleLogin = async() => {
 
-  authStore.signInWithMagicLink(credentials.email)
+  let result = await authStore.loginUser(credentials)
 
-  // if (success) {
-  //   // Successful login
-  //   $q.notify({
-  //     color: 'positive',
-  //     message: 'Login successful',
-  //     icon: 'check_circle',
-  //   })
-  //
-  //   // Redirect to home page
-  //   router.push('/dashboard')
-  // } else {
-  //   // Login failed
-  //   $q.notify({
-  //     color: 'negative',
-  //     message: error || 'Login failed',
-  //     icon: 'error',
-  //   })
-  // }
+  // authStore.signInWithMagicLink(credentials.email)
+
+  const { success, error } = result
+  if (success) {
+    // login successful
+    console.log('Login successful!')
+    showSuccess('Login successful!')
+  }
+  if (error) {
+    // Login failed
+    showError(error.message)
+  }
 }
 
 // Handle sign up
