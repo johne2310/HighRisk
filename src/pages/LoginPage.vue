@@ -1,63 +1,35 @@
 <template>
   <q-page padding
           class="flex flex-center">
-    <q-card class="auth-card">
-      <q-card-section class="text-center">
-        <div class="text-h4 text-primary q-mb-md">High Risk Patient Medication Audit</div>
-        <div class="text-subtitle1 q-mb-lg">Please sign in to continue</div>
-      </q-card-section>
+    <AuthCard @show-signup="showSignUp = true">
+      <template #main-content>
+        <q-tabs v-model="tab"
+                dense
+                class="text-grey"
+                active-color="primary"
+                indicator-color="primary"
+                align="justify"
+                narrow-indicator>
+          <q-tab name="password"
+                 label="Email/Password" />
+          <q-tab name="magiclink"
+                 label="Magic Link" />
+        </q-tabs>
 
-      <q-card-section>
-        <q-form @submit="handleLogin"
-                class="q-gutter-md">
-          <q-input v-model="credentials.email"
-                   label="Email"
-                   type="email"
-                   outlined
-                   :rules="[(val) => !!val || 'Email is required', isValidEmail]" />
+        <q-separator />
 
-          <q-input v-model="credentials.password"
-                   label="Password"
-                   :type="isPwd ? 'password' : 'text'"
-                   outlined
-                   :rules="[(val) => !!val || 'Password is required']">
-            <template v-slot:append>
-              <q-icon :name="isPwd ? 'visibility_off' : 'visibility'"
-                      class="cursor-pointer"
-                      @click="isPwd = !isPwd" />
-            </template>
-          </q-input>
+        <q-tab-panels v-model="tab"
+                      animated>
+          <q-tab-panel name="password">
+            <LoginForm />
+          </q-tab-panel>
 
-          <div class="q-mt-md">
-            <q-btn label="Sign In"
-                   type="submit"
-                   color="primary"
-                   class="full-width"
-                   :loading="loading" />
-          </div>
-
-          <div class="text-center q-mt-sm">
-            <q-btn flat
-                   color="primary"
-                   label="Forgot Password?"
-                   @click="gotoResetPassword"
-                   :disable="loading" />
-          </div>
-
-          <q-separator class="q-my-md" />
-
-          <div class="text-center">
-            <p class="text-grey-8">Don't have an account?</p>
-            <q-btn outline
-                   color="secondary"
-                   label="Sign Up"
-                   class="full-width"
-                   @click="showSignUp = true"
-                   :disable="loading" />
-          </div>
-        </q-form>
-      </q-card-section>
-    </q-card>
+          <q-tab-panel name="magiclink">
+            <MagicLinkLogin />
+          </q-tab-panel>
+        </q-tab-panels>
+      </template>
+    </AuthCard>
 
     <!-- Sign Up Dialog -->
     <q-dialog v-model="showSignUp">
@@ -113,21 +85,17 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useQuasar } from 'quasar'
+import { computed, ref } from 'vue'
 import { useAuthStore } from 'stores/auth-store.js'
 import { useToaster } from 'src/composables/userToaster.js'
+import LoginForm from 'src/components/LoginForm.vue'
+import MagicLinkLogin from 'src/components/MagicLinkLogin.vue'
+import AuthCard from 'src/components/AuthCard.vue'
 
-const $q = useQuasar()
-const router = useRouter()
 const authStore = useAuthStore()
 const { showSuccess, showError } = useToaster()
 
-// Login form
-// const email = ref('')
-// const password = ref('')
-const isPwd = ref(true)
+const tab = ref('password') // Default to password login
 const loading = computed(() => authStore.loading)
 
 // Sign up form
@@ -142,35 +110,6 @@ const isValidEmail = (val) => {
   return emailPattern.test(val) || 'Invalid email format'
 }
 
-const credentials = reactive({
-  email: '',
-  password: ''
-})
-
-//go to password reset page
-const gotoResetPassword = () => {
-  router.push('/reset-password')
-}
-
-// Handle login
-const handleLogin = async() => {
-
-  let result = await authStore.loginUser(credentials)
-
-  // authStore.signInWithMagicLink(credentials.email)
-
-  const { success, error } = result
-  if (success) {
-    // login successful
-    console.log('Login successful!')
-    showSuccess('Login successful!')
-  }
-  if (error) {
-    // Login failed
-    showError(error.message)
-  }
-}
-
 // Handle sign up
 const handleSignUp = () => {
   console.log('credentials: ', signUpEmail.value, signUpPassword.value)
@@ -180,66 +119,15 @@ const handleSignUp = () => {
   })
 
   if (success) {
-    $q.notify({
-      color: 'positive',
-      message: 'Sign up successful! Please check your email for verification.',
-      icon: 'check_circle',
-      closeBtn: 'OK'
-    })
+    showSuccess('Sign up successful! Please check your email for verification.')
 
     showSignUp.value = false
   } else {
-    $q.notify({
-      color: 'negative',
-      message: error || 'Sign up failed',
-      icon: 'error',
-      position: 'bottom',
-      timeout: 1000,
-      actions: [
-        {
-          label: 'Dismiss',
-          color: 'white',
-          handler: () => {
-            /* ... */
-          }
-        }
-      ]
-    })
+    showError(error || 'Sign up failed')
   }
 }
-
-// Handle password reset
-// const resetPassword = async () => {
-//   if (!email.value) {
-//     $q.notify({
-//       color: 'warning',
-//       message: 'Please enter your email address',
-//       icon: 'warning',
-//     })
-//     return
-//   }
-//
-//   const { success, error } = await authStore.resetPassword(email.value)
-//
-//   if (success) {
-//     $q.notify({
-//       color: 'positive',
-//       message: 'Password reset email sent. Please check your inbox.',
-//       icon: 'check_circle',
-//     })
-//   } else {
-//     $q.notify({
-//       color: 'negative',
-//       message: error || 'Failed to send reset email',
-//       icon: 'error',
-//     })
-//   }
-// }
 </script>
 
 <style scoped>
-.auth-card {
-  width: 100%;
-  max-width: 400px;
-}
+/* No longer needed here as it's in AuthCard.vue */
 </style>

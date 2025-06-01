@@ -33,7 +33,7 @@ const surveyStore = useSurveyStore()
 // Fetch all audits, high-risk audits, and stats when the component is mounted
 onMounted(async() => {
   await Promise.all([
-    surveyStore.fetchAudits(),
+    surveyStore.loadAudits(),
     surveyStore.loadHighRiskAudits(),
     surveyStore.fetchStats()
   ])
