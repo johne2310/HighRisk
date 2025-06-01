@@ -61,10 +61,12 @@ const isValidEmail = (val) => {
 }
 
 const gotoResetPassword = () => {
-  router.push('/reset-password')
+  console.log('reset password')
+  router.push({ name: 'reset-password' })
 }
 
 const handleLogin = async() => {
+  console.log('sending credentials: ', credentials)
   let result = await authStore.loginUser(credentials)
 
   const { success, error } = result

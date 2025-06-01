@@ -41,13 +41,13 @@
         <q-card-section>
           <q-form @submit="handleSignUp"
                   class="q-gutter-md">
-            <q-input v-model="signUpEmail"
+            <q-input v-model="credentials.email"
                      label="Email"
                      type="email"
                      outlined
                      :rules="[(val) => !!val || 'Email is required', isValidEmail]" />
 
-            <q-input v-model="signUpPassword"
+            <q-input v-model="credentials.password"
                      label="Password"
                      :type="isSignUpPwd ? 'password' : 'text'"
                      outlined
@@ -85,7 +85,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useAuthStore } from 'stores/auth-store.js'
 import { useToaster } from 'src/composables/userToaster.js'
 import LoginForm from 'src/components/LoginForm.vue'
@@ -100,9 +100,11 @@ const loading = computed(() => authStore.loading)
 
 // Sign up form
 const showSignUp = ref(false)
-const signUpEmail = ref('')
-const signUpPassword = ref('')
 const isSignUpPwd = ref(true)
+const credentials = reactive({
+  email: '',
+  password: ''
+})
 
 // Email validation
 const isValidEmail = (val) => {
@@ -111,19 +113,18 @@ const isValidEmail = (val) => {
 }
 
 // Handle sign up
-const handleSignUp = () => {
-  console.log('credentials: ', signUpEmail.value, signUpPassword.value)
-  const { success, error } = authStore.registerUser({
-    email: signUpEmail.value,
-    password: signUpPassword.value
-  })
+const handleSignUp = async() => {
+  console.log('credentials: ', credentials)
+  let result = await authStore.registerUser(credentials)
+
+  const { success, error } = result
 
   if (success) {
     showSuccess('Sign up successful! Please check your email for verification.')
-
     showSignUp.value = false
-  } else {
-    showError(error || 'Sign up failed')
+  }
+  if (error) {
+    showError(error.message || 'Sign up failed')
   }
 }
 </script>

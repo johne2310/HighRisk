@@ -4,7 +4,23 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/AuthLayout.vue'),
-    children: [{ path: 'login', component: () => import('pages/LoginPage.vue') }]
+    children: [
+      {
+        path: 'login',
+        name: 'login',
+        component: () => import('pages/LoginPage.vue')
+      },
+      {
+        path: 'reset-password',
+        name: 'reset-password',
+        component: () => import('pages/ResetPasswordPage.vue')
+      },
+
+      {
+        path: 'change-password',
+        component: () => import('pages/ChangePasswordPage.vue')
+      }
+    ]
   },
   {
     path: '/',
@@ -41,40 +57,6 @@ const routes = [
         meta: { requiresAuth: true }
       }
     ]
-  },
-  {
-    path: '/',
-    component: () => import('layouts/AuthLayout.vue'),
-    children: [
-      {
-        path: 'reset-password',
-        component: () => import('pages/ResetPasswordPage.vue'),
-        meta: { requiresAuth: false }
-      },
-      {
-        path: 'change-password',
-        component: () => import('pages/ChangePasswordPage.vue'),
-        meta: { requiresAuth: false }
-      }
-    ]
-  },
-
-  {
-    path: '',
-    redirect: '/login', // Default redirect
-    beforeEnter: async(to, from) => {
-      console.log('Route guard execution empty path', to.path, from.path)
-      // const authStoreModule = await import('stores/auth-store.js')
-      // const { useAuthStore } = authStoreModule
-      // const authStore = useAuthStore()
-
-      // if (authStore.isAuthenticated && !authStore.loading) {
-      //   console.log('authenticated: ')
-      //   next('/dashboard')
-      // } else {
-      //   next()
-      // }
-    }
   },
 
   // Always leave this as last one,

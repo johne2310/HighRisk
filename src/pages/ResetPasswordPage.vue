@@ -62,6 +62,7 @@ const handleSubmit = async() => {
   loading.value = true
   error.value = null
   successMessage.value = null
+  console.log('resetting password for: ', email.value)
 
   try {
     const result = await authStore.resetPassword(email.value)

@@ -110,17 +110,19 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // Sign up with email and password
-  const registerUser = async(email, password) => {
+  const registerUser = async({ email, password }) => {
     console.log('Register user with credentials: ', email, password)
     let { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password
+      email,
+      password
     })
     if (error) {
       console.error('Error signing up:', error.message)
+      return { success: false, error: error.message }
     }
     if (data) {
       console.log('User data: ', data)
+      return { success: true }
     }
   }
 
@@ -140,7 +142,8 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.day41.app/#/change-password'
+        redirectTo: 'https://www.day41.app/change-password'
+        // redirectTo: 'http://localhost:5173/change-password'
       })
 
       if (resetError) throw resetError
