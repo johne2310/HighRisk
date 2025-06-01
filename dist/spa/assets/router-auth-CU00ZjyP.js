@@ -1,0 +1,1 @@
+import{d as s,u as a}from"./index-BqFD115I.js";const i=s(({router:t})=>{t.beforeEach(e=>{const r=a();if(e.path==="/reset-password")return!0;if(e.path==="/change-password")return!0;if(e.path!=="/login"&&!r.userDetails.id)return"/login";if(e.path==="/login"&&r.userDetails.id)return!1})});export{i as default};

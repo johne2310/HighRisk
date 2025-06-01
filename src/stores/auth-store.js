@@ -140,11 +140,13 @@ export const useAuthStore = defineStore('auth', () => {
   const resetPassword = async(email) => {
     loading.value = true
     error.value = null
+    console.log('resetting password for: ', email)
     try {
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.day41.app/change-password'
-        // redirectTo: 'http://localhost:5173/change-password'
-      })
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email,
+        {
+          // redirectTo: 'https://www.day41.app/change-password'
+          // redirectTo: 'http://localhost:5173/change-password'
+        })
 
       if (resetError) throw resetError
 
