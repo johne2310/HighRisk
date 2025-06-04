@@ -5,17 +5,19 @@ export default defineBoot(({ router }) => {
   router.beforeEach((to) => {
     const authStore = useAuthStore()
 
-    if (to.path === '/reset-password') {
+    if (to.path === '/auth/reset-password') {
       return true
-    } else if (to.path === '/change-password') {
+    }
+    if (to.path === '/change-password') {
+      console.log('change password from route guard')
       return true
     }
     //test if user is not logged in and attempting to access other pages
-    else if (to.path !== '/login' && !authStore.userDetails.id) {
-      return '/login'
+    if (to.path !== '/auth/login' && !authStore.userDetails.id) {
+      return '/auth/login'
     }
     //test if user is logged in and trying to get to login in page
-    else if (to.path === '/login' && authStore.userDetails.id) {
+    if (to.path === '/auth/login' && authStore.userDetails.id) {
       return false
     }
   })

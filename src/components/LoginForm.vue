@@ -55,27 +55,34 @@ const credentials = reactive({
   password: ''
 })
 
+/*
+  Check email validity
+*/
 const isValidEmail = (val) => {
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
   return emailPattern.test(val) || 'Invalid email format'
 }
 
+/*
+  Open reset password modal
+*/
 const gotoResetPassword = () => {
-  console.log('reset password')
   router.push({ name: 'reset-password' })
 }
 
+/*
+  Log user in via email and password
+*/
 const handleLogin = async() => {
-  console.log('sending credentials: ', credentials)
   let result = await authStore.loginUser(credentials)
 
   const { success, error } = result
   if (success) {
-    console.log('Login successful!')
     showSuccess('Login successful!')
+    router.push('/dashboard')
   }
   if (error) {
-    showError(error.message)
+    showError(error)
   }
 }
 </script>

@@ -43,7 +43,7 @@ export const useSurveyStore = defineStore('survey', () => {
     */
     const getHighRiskAuditCount = async() => {
       const { data: highRiskCount, error: highRiskError } = await supabase.rpc(
-        'get_highrisk_audit_count'
+        'get_high_risk_audit_count'
       )
       if (highRiskError) {
         console.error('Error fetching high risk audits:', highRiskError)

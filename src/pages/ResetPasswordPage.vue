@@ -45,11 +45,13 @@
 import { useAuthStore } from 'stores/auth-store.js'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToaster } from 'src/composables/userToaster.js'
 
 const router = useRouter()
+const { showSuccess, showError } = useToaster()
 
 const gotoLogin = () => {
-  router.push('/login')
+  router.push('/auth/login')
 }
 
 const email = ref('')
@@ -60,24 +62,21 @@ const authStore = useAuthStore()
 
 const handleSubmit = async() => {
   loading.value = true
-  error.value = null
-  successMessage.value = null
   console.log('resetting password for: ', email.value)
 
-  try {
-    const result = await authStore.resetPassword(email.value)
-    if (result.success) {
-      successMessage.value = 'Password reset link sent to your email.'
-    } else {
-      error.value = result.error
-    }
+  let result = await authStore.resetPassword(email.value)
+
+  const { success, error } = result
+
+  if (success) {
+    //show success message
+    showSuccess('Password reset link sent to your email.')
+  } else if (error) {
+    //show error message
+    showError(error.message)
   }
-  catch (err) {
-    error.value = err.message || 'An unexpected error occurred.'
-  }
-  finally {
-    loading.value = false
-  }
+
+  loading.value = false
 }
 </script>
 

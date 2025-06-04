@@ -2,7 +2,7 @@
 
 const routes = [
   {
-    path: '/',
+    path: '/auth',
     component: () => import('layouts/AuthLayout.vue'),
     children: [
       {
@@ -14,12 +14,6 @@ const routes = [
         path: 'reset-password',
         name: 'reset-password',
         component: () => import('pages/ResetPasswordPage.vue')
-      },
-
-      {
-        path: 'change-password',
-        name: 'change-password',
-        component: () => import('pages/ChangePasswordPage.vue')
       }
     ]
   },
@@ -54,8 +48,12 @@ const routes = [
       },
       {
         path: 'help',
-        component: () => import('pages/HelpPage.vue'),
-        meta: { requiresAuth: true }
+        component: () => import('pages/HelpPage.vue')
+      },
+      {
+        path: 'change-password',
+        name: 'change-password',
+        component: () => import('pages/ChangePasswordPage.vue')
       }
     ]
   },

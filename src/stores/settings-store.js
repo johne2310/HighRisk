@@ -8,7 +8,8 @@ const isLocalStorageAvailable = () => {
     localStorage.setItem(testKey, testKey)
     localStorage.removeItem(testKey)
     return true
-  } catch {
+  }
+  catch {
     return false
   }
 }
@@ -20,13 +21,14 @@ export const useSettingsStore = defineStore('settings', () => {
     defaultHospital: null,
     defaultWard: null,
     rememberSettings: true,
+    passwordReset: false
   })
 
   const appSettings = ref({
     theme: 'blue',
     dateFormat: 'YYYY-MM-DD',
     notifications: true,
-    autoSave: true,
+    autoSave: true
   })
 
   const loading = ref(false)
@@ -50,7 +52,8 @@ export const useSettingsStore = defineStore('settings', () => {
       if (savedAppSettings) {
         appSettings.value = JSON.parse(savedAppSettings)
       }
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error loading settings from localStorage:', err)
       error.value = err.message || 'Failed to load settings'
     }
@@ -70,11 +73,11 @@ export const useSettingsStore = defineStore('settings', () => {
         setupAutoSave()
       }
     },
-    { immediate: true },
+    { immediate: true }
   )
 
   // Function to set up auto-save watchers
-  function setupAutoSave() {
+  function setupAutoSave () {
     if (appSettings.value.autoSave && isLocalStorageAvailable()) {
       // Watch for changes in userSettings and save automatically
       watch(
@@ -84,7 +87,7 @@ export const useSettingsStore = defineStore('settings', () => {
             saveUserSettings()
           }
         },
-        { deep: true },
+        { deep: true }
       )
 
       // Watch for changes in appSettings and save automatically
@@ -95,7 +98,7 @@ export const useSettingsStore = defineStore('settings', () => {
             saveAppSettings()
           }
         },
-        { deep: true },
+        { deep: true }
       )
     }
   }
@@ -113,11 +116,13 @@ export const useSettingsStore = defineStore('settings', () => {
     try {
       localStorage.setItem('userSettings', JSON.stringify(userSettings.value))
       return { success: true }
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error saving user settings:', err)
       error.value = err.message || 'Failed to save user settings'
       return { success: false, error: error.value }
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
@@ -134,11 +139,13 @@ export const useSettingsStore = defineStore('settings', () => {
     try {
       localStorage.setItem('appSettings', JSON.stringify(appSettings.value))
       return { success: true }
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error saving app settings:', err)
       error.value = err.message || 'Failed to save app settings'
       return { success: false, error: error.value }
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
@@ -148,7 +155,7 @@ export const useSettingsStore = defineStore('settings', () => {
       theme: 'blue',
       dateFormat: 'YYYY-MM-DD',
       notifications: true,
-      autoSave: true,
+      autoSave: true
     }
 
     if (!isLocalStorageAvailable()) {
@@ -170,6 +177,6 @@ export const useSettingsStore = defineStore('settings', () => {
     loadSettings,
     saveUserSettings,
     saveAppSettings,
-    resetAppSettings,
+    resetAppSettings
   }
 })

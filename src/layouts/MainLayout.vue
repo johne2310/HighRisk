@@ -95,6 +95,12 @@ const linksList = [
     caption: 'User guide and support',
     icon: 'help',
     link: '/help'
+  },
+  {
+    title: 'Change password',
+    caption: 'change password',
+    icon: 'password',
+    link: '/change-password'
   }
 ]
 
@@ -115,7 +121,7 @@ const handleLogout = () => {
     })
 
     // Redirect to login page
-    router.push('/login')
+    router.push('/auth/login')
   }
   if (error) {
     $q.notify({

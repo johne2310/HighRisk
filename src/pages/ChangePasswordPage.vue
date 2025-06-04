@@ -5,29 +5,41 @@
       <q-card-section>
         <div class="text-h5">Change Password</div>
       </q-card-section>
-
+      
       <q-card-section>
         <q-form @submit="handleChangePassword"
                 class="q-gutter-md">
           <q-input filled
-                   type="password"
+                   :type="isPwd ? 'password' : 'text'"
                    v-model="newPassword"
                    label="New Password"
                    lazy-rules
                    :rules="[
               (val) => !!val || 'Field is required',
               (val) => val.length >= 6 || 'Use at least 6 characters',
-            ]" />
+            ]">
+            <template v-slot:append>
+              <q-icon :name="isPwd ? 'visibility_off' : 'visibility'"
+                      class="cursor-pointer"
+                      @click="isPwd = !isPwd"></q-icon>
+            </template>
+          </q-input>
 
           <q-input filled
-                   type="password"
+                   :type="isPwd ? 'password' : 'text'"
                    v-model="confirmPassword"
                    label="Confirm Password"
                    lazy-rules
                    :rules="[
               (val) => !!val || 'Field is required',
               (val) => val === newPassword || 'Passwords do not match',
-            ]" />
+            ]">
+            <template v-slot:append>
+              <q-icon :name="isPwd ? 'visibility_off' : 'visibility'"
+                      class="cursor-pointer"
+                      @click="isPwd = !isPwd"></q-icon>
+            </template>
+          </q-input>
 
           <div>
             <q-btn color="primary"
@@ -52,82 +64,44 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from 'stores/auth-store.js'
-import { useQuasar } from 'quasar'
+import { useToaster } from 'src/composables/userToaster.js'
 
 const newPassword = ref('')
 const confirmPassword = ref('')
 const loading = ref(false)
 const error = ref(null)
 const successMessage = ref(null)
+const isPwd = ref(true)
 
 const router = useRouter()
-const route = useRoute()
 const authStore = useAuthStore()
-const $q = useQuasar()
-const accessToken = null
-
-onMounted(() => {
-  if (window.location.hash) {
-    const hashParams = new URLSearchParams(window.location.hash.substring(1))
-    accessToken.value = hashParams.get('access_token')
-    if (accessToken.value) {
-      console.log('Access Token (from hash):', accessToken.value)
-    } else {
-      console.warn('Access token not found in URL hash.')
-    }
-  }
-  console.log('Change Password Page')
-})
+const { showSuccess, showError } = useToaster()
 
 const handleChangePassword = async() => {
   loading.value = true
   error.value = null
   successMessage.value = null
-
   console.log('New Password: ', newPassword.value)
-  const accessToken = route.query.access_token
-  if (accessToken) {
-    console.log('Access token: ', accessToken)
-  } else {
-    console.log('no access token: ')
-  }
-  try {
-    if (accessToken) console.log('Access token: ', accessToken)
-    // Call Supabase to update the password
-    const { error: updateError } = await authStore.supabase.auth.updateUser({
-      password: newPassword.value
-    })
 
-    if (updateError) {
-      throw new Error(updateError.message)
-    }
-
-    successMessage.value = 'Password changed successfully! Redirecting to login...'
-    $q.notify({
-      color: 'positive',
-      message: successMessage.value,
-      icon: 'check_circle'
-    })
-
-    // Redirect to login after a short delay
-    setTimeout(() => {
+  if (authStore.userDetails.id) {
+    console.log('User ID is logged: ', authStore.userDetails.id)
+    let result = await authStore.changePassword(newPassword.value)
+    const { success, error } = result
+    if (success) {
+      showSuccess('Password changed successfully!')
       router.push('/dashboard')
-    }, 2000) // Adjust the delay as needed
+    }
+    if (error) {
+      showError(error.message)
+    }
+  } else {
+    console.log('User is not logged: ')
+    router.push('/auth/login')
   }
-  catch (err) {
-    error.value = err.message || 'An unexpected error occurred.'
-    $q.notify({
-      color: 'negative',
-      message: error.value,
-      icon: 'warning'
-    })
-  }
-  finally {
-    loading.value = false
-  }
+  loading.value = false
 }
 </script>
 

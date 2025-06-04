@@ -1,0 +1,1 @@
+import{d as a,u}from"./index-CEJet-6z.js";const s=a(({router:t})=>{t.beforeEach(e=>{const r=u();if(e.path==="/auth/reset-password")return!0;if(e.path==="/change-password")return console.log("change password from route guard"),!0;if(e.path!=="/auth/login"&&!r.userDetails.id)return"/auth/login";if(e.path==="/auth/login"&&r.userDetails.id)return!1})});export{s as default};

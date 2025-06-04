@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import supabase from './supabase/index.js'
 import { useRouter } from 'vue-router'
 import { useSurveyStore } from 'stores/survey-store.js'
@@ -8,7 +8,6 @@ import { useToaster } from 'src/composables/userToaster.js'
 export const useAuthStore = defineStore('auth', () => {
 
   // State
-
   const { showSuccess, showError } = useToaster()
   const user = ref(null)
   const loading = ref(false)
@@ -23,42 +22,38 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   // Getters
-  // Getters
-  const isAuthenticated = computed(() => !!userDetails.id)
 
   // Actions
+
   // Initialize the store by checking for an existing session
   const initialize = async() => {
-    // loading.value = true
-    // error.value = null
+
     const router = useRouter()
     const surveyStore = useSurveyStore()
-
-    // Check current session first
-    const { data } = await supabase.auth.getSession()
-    if (data.session) {
-      userDetails.id = data.session.user.id
-      userDetails.email = data.session.user.email
-      await router.push('/dashboard')
-      await surveyStore.loadAudits()
-    }
+    const isPwdReset = ref(false)
 
     supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth event:', event) // Add this line
-      console.log('Auth session:', session)
+      // console.log('Auth event:', event) // Add this line
+      // console.log('Auth session:', session)
+      if (event === 'PASSWORD_RECOVERY') {
+        isPwdReset.value = true
+        router.replace('/change-password')
 
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+      } else if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
         if (session !== null) {
           userDetails.id = session.user.id
           userDetails.email = session.user.email
           // console.log('User details from authstatechange: ', event, userDetails)
-          router.push('/dashboard')
+          if (!isPwdReset.value) {
+            console.log('isPwdReset: ', isPwdReset.value)
+            router.push('/dashboard')
+          }
           surveyStore.loadAudits() //load audits on login
         }
       } else if (event === 'SIGNED_OUT') {
         Object.assign(userDetails, userDetailsDefault)
         // console.log('User is signed out')
-        router.replace('/login')
+        router.replace('/auth/login')
       }
     })
   }
@@ -74,8 +69,8 @@ export const useAuthStore = defineStore('auth', () => {
         // If `localhost` is verified, the email won't be sent, and the user will be automatically signed in.
         // This is intended for testing purposes.
         // The router will handle the magic link parameters and redirect to the dashboard
-        // emailRedirectTo: 'http://localhost:9000/dashboard'
-        emailRedirectTo: 'https://www.day41.app/dashboard'
+        emailRedirectTo: 'http://localhost:9000/dashboard'
+        // emailRedirectTo: 'https://www.day41.app/dashboard'
       }
     })
 
@@ -98,13 +93,11 @@ export const useAuthStore = defineStore('auth', () => {
 
     if (error) {
       console.error('Error signing in:', error.message)
-      showError(error.message)
       return { success: false, error: error.message }
     }
     if (data.session !== null) {
       console.log('data: ', data)
       // Successful login
-      // showSuccess('Login successful'
       return { success: true }
     }
   }
@@ -138,27 +131,33 @@ export const useAuthStore = defineStore('auth', () => {
   }
   // Reset password
   const resetPassword = async(email) => {
-    loading.value = true
-    error.value = null
+    // loading.value = true
     console.log('resetting password for: ', email)
-    try {
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email,
-        {
-          // redirectTo: 'https://www.day41.app/change-password'
-          // redirectTo: 'http://localhost:5173/change-password'
-        })
-
-      if (resetError) throw resetError
-
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email,
+      {
+        redirectTo: 'https://www.day41.app/change-password'
+        // redirectTo: 'http://localhost:9000/change-password'
+      })
+    // loading.value = false
+    if (resetError) {
+      // throw resetError
+      return { success: false, error: resetError.message }
+    } else {
       return { success: true }
     }
-    catch (err) {
-      console.error('Error resetting password:', err)
-      error.value = err.message
-      return { success: false, error: err.message }
-    }
-    finally {
-      loading.value = false
+
+  }
+
+  /*
+    Change password function
+  */
+  const changePassword = async(password) => {
+    const { error } = await supabase.auth.updateUser({ password: password })
+
+    if (error) {
+      return { success: false, error: error.message }
+    } else {
+      return { success: true }
     }
   }
 
@@ -170,7 +169,6 @@ export const useAuthStore = defineStore('auth', () => {
     userDetails,
 
     // Getters
-    isAuthenticated,
 
     // Actions
     initialize,
@@ -179,6 +177,7 @@ export const useAuthStore = defineStore('auth', () => {
     logoutUser,
     loginUser,
     resetPassword,
-    signInWithMagicLink
+    signInWithMagicLink,
+    changePassword
   }
 })
