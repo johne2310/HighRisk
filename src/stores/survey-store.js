@@ -75,7 +75,7 @@ export const useSurveyStore = defineStore('survey', () => {
           ? 0
           : (stats.value.highRiskCount / stats.value.totalAudits) * 100
       stats.value.highRiskPercentage = Math.round(highRiskPercentage)
-      console.log('high riks %: ', stats.value.highRiskPercentage)
+      console.log('high risk %: ', stats.value.highRiskPercentage)
     }
 
     /*
@@ -147,12 +147,16 @@ export const useSurveyStore = defineStore('survey', () => {
       Save audit to supabase
     */
     const saveAudit = async(auditData) => {
-      const { data, error: saveError } = await supabase
+      console.log('auditData: ', auditData)
+      const { data, error } = await supabase
         .from('patient_audits')
         .insert([auditData])
         .select()
 
-      if (saveError) return { success: false }
+      if (error) {
+        console.error('Error saving audit:', error.message)
+        return { success: false, error: error.message }
+      }
 
       if (data) {
         await fetchStats()
@@ -189,7 +193,7 @@ export const useSurveyStore = defineStore('survey', () => {
         .eq('id', id)
         .select()
 
-      if (updateError) return { success: false }
+      if (updateError) return { success: false, error: updateError }
 
       if (data) {
         await fetchStats()
@@ -219,6 +223,7 @@ export const useSurveyStore = defineStore('survey', () => {
       await getTodayAuditCount()
       await getHighRiskAuditCount()
       await getAuditCount()
+      await highRiskPercentage()
       return {}
     }
 

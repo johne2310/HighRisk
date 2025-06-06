@@ -135,6 +135,7 @@ export const useAuthStore = defineStore('auth', () => {
     console.log('resetting password for: ', email)
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email,
       {
+        //toggle the lines below: localhost for local testing or day41 for production
         redirectTo: 'https://www.day41.app/change-password'
         // redirectTo: 'http://localhost:9000/change-password'
       })
@@ -145,7 +146,6 @@ export const useAuthStore = defineStore('auth', () => {
     } else {
       return { success: true }
     }
-
   }
 
   /*

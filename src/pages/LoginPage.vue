@@ -124,7 +124,7 @@ const handleSignUp = async() => {
     showSignUp.value = false
   }
   if (error) {
-    showError(error.message || 'Sign up failed')
+    showError(error || 'Sign up failed')
   }
 }
 </script>

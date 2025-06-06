@@ -5,7 +5,7 @@
       <q-card-section>
         <div class="text-h5">Change Password</div>
       </q-card-section>
-      
+
       <q-card-section>
         <q-form @submit="handleChangePassword"
                 class="q-gutter-md">
@@ -92,6 +92,7 @@ const handleChangePassword = async() => {
     const { success, error } = result
     if (success) {
       showSuccess('Password changed successfully!')
+      successMessage.value = ''
       router.push('/dashboard')
     }
     if (error) {
@@ -99,6 +100,7 @@ const handleChangePassword = async() => {
     }
   } else {
     console.log('User is not logged: ')
+    showError('User is not logged in. Please login to change password.')
     router.push('/auth/login')
   }
   loading.value = false

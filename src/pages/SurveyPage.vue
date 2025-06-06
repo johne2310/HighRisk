@@ -66,10 +66,11 @@ const handleSubmit = async(formData) => {
   if (isEditing.value) {
     result = await surveyStore.editAudit(auditId.value, formData)
   } else {
+    console.log('Creating new audit')
     result = await surveyStore.saveAudit(formData)
   }
 
-  const { success, error } = result
+  const { success } = result
 
 // success or error are returned from the survey store functions
   if (success) {
@@ -77,7 +78,7 @@ const handleSubmit = async(formData) => {
     // Redirect to surveys list
     // router.push('/surveys')
   } else {
-    showError(error.message)
+    showError('There as an error saving the audit. Please try again.')
   }
 }
 </script>
